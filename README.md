@@ -16,11 +16,17 @@ This fork contains a version that relieves the user of the horrors of a ROS depe
 
 # 1. Quickstart / Minimal Setup
 
-Requires OpenCV (with nonfree if you want FABMAP), Boost, Eigen, Pangolin and g2o. Tested on 14.04 without any problems.
+- Install `boost glew glm libqglviewer suite-sparse eigen cmake opencv qt5` using 'brew'
+- Follow the instructions to compile [Pangolin](https://github.com/stevenlovegrove/Pangolin) and [g2o](https://github.com/RainerKuemmerle/g2o)
+- Update `build settings -> header search path & library search path`
+- Update `build phases -> link binary with libraries`
+- Copy `libg2o***.dylib & libpangolin.dylib` to `/usr/local/lib`
 
-# 2. Installation
+![header search path](images/1.png)
+![library search path](images/2.png)
+![link binary with libraries](images/3.png)
 
-Install everything from apt repos if you can, otherwise there are githubs for Pangolin and g2o. Then usual cmake building process.
+There are still a bit problem with g2o optimization, but at least can run it on Xcode.
 
 # 3. Running
 
