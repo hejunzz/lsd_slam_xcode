@@ -89,7 +89,7 @@ void GUI::preCall()
 void GUI::addKeyframe(Keyframe * newFrame)
 {
     boost::mutex::scoped_lock lock(keyframes.getMutex());
-
+    
     //Exists
     if(keyframes.getReference().find(newFrame->id) != keyframes.getReference().end())
     {
@@ -99,7 +99,7 @@ void GUI::addKeyframe(Keyframe * newFrame)
     }
     else
     {
-        newFrame->initId = keyframes.getReference().size();
+        newFrame->initId = (int) keyframes.getReference().size();
         keyframes.getReference()[newFrame->id] = newFrame;
     }
 
@@ -124,8 +124,9 @@ void GUI::updateKeyframePoses(GraphFramePose* framePoseData, int num)
 void GUI::drawImages()
 {
     boost::mutex::scoped_lock lock(depthImgBuffer.getMutex());
-
+    
     depthImg->Upload(depthImgBuffer.getReference(), GL_RGB, GL_UNSIGNED_BYTE);
+    
 
     lock.unlock();
 
@@ -144,15 +145,15 @@ void GUI::drawKeyframes()
     for(std::map<int, Keyframe *>::iterator i = keyframes.getReference().begin(); i != keyframes.getReference().end(); ++i)
     {
         //Don't render first five, according to original code
-        if(i->second->initId >= 5)
-        {
+        //if(i->second->initId >= 5)
+        //{
             if(!i->second->hasVbo || i->second->needsUpdate)
             {
                 i->second->computeVbo();
             }
             i->second->drawPoints();
             i->second->drawCamera();
-        }
+        //}
     }
 
     glDisable(GL_MULTISAMPLE);

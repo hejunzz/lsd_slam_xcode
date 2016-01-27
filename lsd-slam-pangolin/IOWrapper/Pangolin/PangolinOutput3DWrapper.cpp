@@ -134,7 +134,7 @@ void PangolinOutput3DWrapper::publishKeyframeGraph(KeyFrameGraph* graph)
 {
     graph->keyframesAllMutex.lock_shared();
 
-    int num = graph->keyframesAll.size();
+    int num = (int) graph->keyframesAll.size();
 
     unsigned char * buffer = new unsigned char[num * sizeof(GraphFramePose)];
 
