@@ -45,21 +45,18 @@
 		0A3D02041C5748A600B387CC /* libg2o_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A3D01361C5728EF00B387CC /* libg2o_core.dylib */; };
 		0A3D02091C5748E500B387CC /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A3D02081C5748E500B387CC /* OpenGL.framework */; };
 		0A3D02481C5792A600B387CC /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A3D02471C5792A600B387CC /* libz.tbd */; };
-		0A3D02811C579CA200B387CC /* libg2o_types_sba.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A3D02621C579C4700B387CC /* libg2o_types_sba.dylib */; };
-		0A3D02821C579CD500B387CC /* libg2o_stuff.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A3D025E1C579C4700B387CC /* libg2o_stuff.dylib */; };
-		0A3D02861C57A07000B387CC /* libg2o_csparse_extension.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A3D01441C572BE000B387CC /* libg2o_csparse_extension.dylib */; };
-		0AC775CC1C58545A009E7A6C /* libg2o_solver_csparse.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A3D01F31C573D6400B387CC /* libg2o_solver_csparse.dylib */; };
-		0AC775CE1C58545A009E7A6C /* libg2o_solver_pcg.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AC775CD1C58545A009E7A6C /* libg2o_solver_pcg.dylib */; };
+		0AC775D41C587289009E7A6C /* libg2o_types_sba.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A3D02621C579C4700B387CC /* libg2o_types_sba.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		0A3D00041C57063700B387CC /* CopyFiles */ = {
+		0A3D00041C57063700B387CC /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
 			dstSubfolderSpec = 0;
 			files = (
 			);
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -137,18 +134,14 @@
 		0A3D013E1C572AE400B387CC /* libboost_thread-mt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libboost_thread-mt.dylib"; path = "../../../../usr/local/Cellar/boost/1.59.0/lib/libboost_thread-mt.dylib"; sourceTree = "<group>"; };
 		0A3D01401C572B0A00B387CC /* libboost_system.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_system.dylib; path = ../../../../usr/local/Cellar/boost/1.59.0/lib/libboost_system.dylib; sourceTree = "<group>"; };
 		0A3D01421C572B2F00B387CC /* libboost_filesystem.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_filesystem.dylib; path = ../../../../usr/local/Cellar/boost/1.59.0/lib/libboost_filesystem.dylib; sourceTree = "<group>"; };
-		0A3D01441C572BE000B387CC /* libg2o_csparse_extension.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libg2o_csparse_extension.dylib; path = ../g2o/lib/libg2o_csparse_extension.dylib; sourceTree = "<group>"; };
 		0A3D01461C572C5D00B387CC /* libcxsparse.3.1.4.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcxsparse.3.1.4.a; path = "../../../../usr/local/Cellar/suite-sparse/4.4.4_2/lib/libcxsparse.3.1.4.a"; sourceTree = "<group>"; };
 		0A3D01481C572C9100B387CC /* libGLEW.1.13.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libGLEW.1.13.0.dylib; path = ../../../../usr/local/Cellar/glew/1.13.0/lib/libGLEW.1.13.0.dylib; sourceTree = "<group>"; };
-		0A3D01F31C573D6400B387CC /* libg2o_solver_csparse.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libg2o_solver_csparse.dylib; path = ../g2o/lib/libg2o_solver_csparse.dylib; sourceTree = "<group>"; };
-		0A3D01F51C573D8C00B387CC /* libg2o_solver_eigen.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libg2o_solver_eigen.dylib; path = ../g2o/lib/libg2o_solver_eigen.dylib; sourceTree = "<group>"; };
 		0A3D02001C57417D00B387CC /* libopencv_calib3d.2.4.12.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_calib3d.2.4.12.dylib; path = ../../../../usr/local/Cellar/opencv/2.4.12/lib/libopencv_calib3d.2.4.12.dylib; sourceTree = "<group>"; };
 		0A3D02011C57417D00B387CC /* libopencv_imgproc.2.4.12.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_imgproc.2.4.12.dylib; path = ../../../../usr/local/Cellar/opencv/2.4.12/lib/libopencv_imgproc.2.4.12.dylib; sourceTree = "<group>"; };
 		0A3D02081C5748E500B387CC /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		0A3D02471C5792A600B387CC /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		0A3D025E1C579C4700B387CC /* libg2o_stuff.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libg2o_stuff.dylib; path = ../g2o/lib/libg2o_stuff.dylib; sourceTree = "<group>"; };
 		0A3D02621C579C4700B387CC /* libg2o_types_sba.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libg2o_types_sba.dylib; path = ../g2o/lib/libg2o_types_sba.dylib; sourceTree = "<group>"; };
-		0AC775CD1C58545A009E7A6C /* libg2o_solver_pcg.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libg2o_solver_pcg.dylib; path = ../g2o/lib/libg2o_solver_pcg.dylib; sourceTree = "<group>"; };
 		0AC775CF1C585958009E7A6C /* libsuitesparseconfig.4.4.4.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsuitesparseconfig.4.4.4.a; path = "../../../../usr/local/Cellar/suite-sparse/4.4.4_2/lib/libsuitesparseconfig.4.4.4.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -157,11 +150,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0AC775CE1C58545A009E7A6C /* libg2o_solver_pcg.dylib in Frameworks */,
-				0AC775CC1C58545A009E7A6C /* libg2o_solver_csparse.dylib in Frameworks */,
-				0A3D02861C57A07000B387CC /* libg2o_csparse_extension.dylib in Frameworks */,
-				0A3D02821C579CD500B387CC /* libg2o_stuff.dylib in Frameworks */,
-				0A3D02811C579CA200B387CC /* libg2o_types_sba.dylib in Frameworks */,
+				0AC775D41C587289009E7A6C /* libg2o_types_sba.dylib in Frameworks */,
 				0A3D02041C5748A600B387CC /* libg2o_core.dylib in Frameworks */,
 				0A3D02481C5792A600B387CC /* libz.tbd in Frameworks */,
 				0A3D02091C5748E500B387CC /* OpenGL.framework in Frameworks */,
@@ -329,18 +318,14 @@
 			isa = PBXGroup;
 			children = (
 				0AC775CF1C585958009E7A6C /* libsuitesparseconfig.4.4.4.a */,
-				0AC775CD1C58545A009E7A6C /* libg2o_solver_pcg.dylib */,
 				0A3D025E1C579C4700B387CC /* libg2o_stuff.dylib */,
 				0A3D02621C579C4700B387CC /* libg2o_types_sba.dylib */,
 				0A3D02471C5792A600B387CC /* libz.tbd */,
 				0A3D02081C5748E500B387CC /* OpenGL.framework */,
 				0A3D02001C57417D00B387CC /* libopencv_calib3d.2.4.12.dylib */,
 				0A3D02011C57417D00B387CC /* libopencv_imgproc.2.4.12.dylib */,
-				0A3D01F51C573D8C00B387CC /* libg2o_solver_eigen.dylib */,
-				0A3D01F31C573D6400B387CC /* libg2o_solver_csparse.dylib */,
 				0A3D01481C572C9100B387CC /* libGLEW.1.13.0.dylib */,
 				0A3D01461C572C5D00B387CC /* libcxsparse.3.1.4.a */,
-				0A3D01441C572BE000B387CC /* libg2o_csparse_extension.dylib */,
 				0A3D01421C572B2F00B387CC /* libboost_filesystem.dylib */,
 				0A3D01401C572B0A00B387CC /* libboost_system.dylib */,
 				0A3D013E1C572AE400B387CC /* libboost_thread-mt.dylib */,
@@ -363,7 +348,7 @@
 			buildPhases = (
 				0A3D00021C57063700B387CC /* Sources */,
 				0A3D00031C57063700B387CC /* Frameworks */,
-				0A3D00041C57063700B387CC /* CopyFiles */,
+				0A3D00041C57063700B387CC /* Copy Files */,
 			);
 			buildRules = (
 			);

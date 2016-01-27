@@ -59,10 +59,6 @@
 
 #endif
 
-void* mempcpy(void* dst, const void* src, size_t len) {
-    return (char*)memcpy(dst, src, len) + len;
-}
-
 class Stopwatch
 {
     public:
@@ -164,6 +160,10 @@ class Stopwatch
         virtual ~Stopwatch()
         {
             close(sockfd);
+        }
+    
+        void* mempcpy(void* dst, const void* src, size_t len) {
+            return (char*)memcpy(dst, src, len) + len;
         }
 
         unsigned char * serialiseTimings(int & packetSize)
