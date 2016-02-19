@@ -41,6 +41,7 @@
 #include "GUI.h"
 
 std::vector<std::string> files;
+std::vector<std::string> helpFiles;
 int w, h, w_inp, h_inp;
 ThreadMutexObject<bool> lsdDone(false);
 GUI gui;
@@ -134,12 +135,28 @@ int getFile (std::string source, std::vector<std::string> &files)
 
 using namespace lsd_slam;
 
+bool imageCheck(cv::Mat imageDist, std::string file) {
+    if(imageDist.rows != h_inp || imageDist.cols != w_inp)
+    {
+        if(imageDist.rows * imageDist.cols == 0)
+            printf("failed to load image %s! skipping.\n", file.c_str());
+        else
+            printf("image %s has wrong dimensions - expecting %d x %d, found %d x %d. Skipping.\n",
+                   file.c_str(),
+                   w,h,imageDist.cols, imageDist.rows);
+        return false;
+    }
+    
+    return true;
+}
+
 void run(SlamSystem * system, Undistorter* undistorter, Output3DWrapper* outputWrapper, Sophus::Matrix3f K)
 {
     // get HZ
     double hz = 30;
 
     cv::Mat image = cv::Mat(h, w, CV_8U);
+    cv::Mat helpImage = cv::Mat(h, w, CV_8U);
     int runningIDX=0;
     float fakeTimeStamp = 0;
 
@@ -149,6 +166,7 @@ void run(SlamSystem * system, Undistorter* undistorter, Output3DWrapper* outputW
             break;
 
         cv::Mat imageDist = cv::Mat(h, w, CV_8U);
+        cv::Mat helpImageDist = cv::Mat(h, w, CV_8U);
 
         if(logReader)
         {
@@ -161,16 +179,15 @@ void run(SlamSystem * system, Undistorter* undistorter, Output3DWrapper* outputW
         else
         {
             imageDist = cv::imread(files[i], CV_LOAD_IMAGE_GRAYSCALE);
-
-            if(imageDist.rows != h_inp || imageDist.cols != w_inp)
-            {
-                if(imageDist.rows * imageDist.cols == 0)
-                    printf("failed to load image %s! skipping.\n", files[i].c_str());
-                else
-                    printf("image %s has wrong dimensions - expecting %d x %d, found %d x %d. Skipping.\n",
-                            files[i].c_str(),
-                            w,h,imageDist.cols, imageDist.rows);
+            
+            if (!imageCheck(imageDist, files[i]))
                 continue;
+            
+            if (useHelpSeq) {
+                helpImageDist = cv::imread(helpFiles[i], CV_LOAD_IMAGE_GRAYSCALE);
+                
+                if (!imageCheck(helpImageDist, helpFiles[i]))
+                    continue;
             }
         }
 
@@ -179,6 +196,14 @@ void run(SlamSystem * system, Undistorter* undistorter, Output3DWrapper* outputW
         undistorter->undistort(imageDist, image);
 
         assert(image.type() == CV_8U);
+        
+        if (useHelpSeq) {
+            assert(helpImageDist.type() == CV_8U);
+            
+            undistorter->undistort(helpImageDist, helpImage);
+            
+            assert(helpImage.type() == CV_8U);
+        }
 
         if(runningIDX == 0)
         {
@@ -260,6 +285,13 @@ int main( int argc, char** argv )
 		printf("need source files! (set using -f FOLDER or KLG)\n");
 		exit(0);
 	}
+    
+    // use help video sequence
+    std::string helpSource;
+    if (useHelpSeq && !(Parse::arg(argc, argv, "-h", helpSource))) {
+        printf("need help video source files! (set using -h FOLDER)\n");
+        exit(0);
+    }
 
 	Bytef * decompressionBuffer = new Bytef[Resolution::getInstance().numPixels() * 2];
     IplImage * deCompImage = 0;
@@ -285,6 +317,21 @@ int main( int argc, char** argv )
         else
         {
             printf("could not load file list! wrong path / file?\n");
+        }
+        
+        if (useHelpSeq) {
+            if(getdir(helpSource, helpFiles) >= 0)
+            {
+                printf("help sequence: found %d image files in folder %s!\n", (int)helpFiles.size(), source.c_str());
+            }
+            else if(getFile(helpSource, helpFiles) >= 0)
+            {
+                printf("help sequence: found %d image files in file %s!\n", (int)helpFiles.size(), source.c_str());
+            }
+            else
+            {
+                printf("help sequence: could not load file list! wrong path / file?\n");
+            }
         }
 
         numFrames = (int)files.size();

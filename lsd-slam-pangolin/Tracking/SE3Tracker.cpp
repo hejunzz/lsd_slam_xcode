@@ -321,7 +321,8 @@ SE3 SE3Tracker::trackFrame(
 		reference->makePointCloud(lvl);
 
 		callOptimized(calcResidualAndBuffers, (reference->posData[lvl], reference->colorAndVarData[lvl], SE3TRACKING_MIN_LEVEL == lvl ? reference->pointPosInXYGrid[lvl] : 0, reference->numData[lvl], frame, referenceToFrame, lvl, (plotTracking && lvl == SE3TRACKING_MIN_LEVEL)));
-		if(buf_warped_size < MIN_GOODPERALL_PIXEL_ABSMIN * (width>>lvl)*(height>>lvl))
+		
+        if(buf_warped_size < MIN_GOODPERALL_PIXEL_ABSMIN * (width>>lvl)*(height>>lvl))
 		{
 			diverged = true;
 			trackingWasGood = false;
@@ -361,12 +362,13 @@ SE3 SE3Tracker::trackFrame(
 
 				// apply increment. pretty sure this way round is correct, but hard to test.
 				Sophus::SE3f new_referenceToFrame = Sophus::SE3f::exp((inc)) * referenceToFrame;
-				//Sophus::SE3f new_referenceToFrame = referenceToFrame * Sophus::SE3f::exp((inc));
+				// Sophus::SE3f new_referenceToFrame = referenceToFrame * Sophus::SE3f::exp((inc));
 
 
 				// re-evaluate residual
 				callOptimized(calcResidualAndBuffers, (reference->posData[lvl], reference->colorAndVarData[lvl], SE3TRACKING_MIN_LEVEL == lvl ? reference->pointPosInXYGrid[lvl] : 0, reference->numData[lvl], frame, new_referenceToFrame, lvl, (plotTracking && lvl == SE3TRACKING_MIN_LEVEL)));
-				if(buf_warped_size < MIN_GOODPERALL_PIXEL_ABSMIN* (width>>lvl)*(height>>lvl))
+				
+                if(buf_warped_size < MIN_GOODPERALL_PIXEL_ABSMIN* (width>>lvl)*(height>>lvl))
 				{
 					diverged = true;
 					trackingWasGood = false;
@@ -423,6 +425,10 @@ SE3 SE3Tracker::trackFrame(
 				}
 				else
 				{
+                    if (useHelpSeq) {
+                        
+                    }
+                    
 					if(enablePrintDebugInfo && printTrackingIterationInfo)
 					{
 						printf("(%d-%d): REJECTED increment of %f with lambda %.1f, (residual: %f -> %f)\n",
@@ -482,7 +488,8 @@ SE3 SE3Tracker::trackFrame(
 	frame->initialTrackedResidual = lastResidual / pointUsage;
 	frame->pose->thisToParent_raw = sim3FromSE3(toSophus(referenceToFrame.inverse()),1);
 	frame->pose->trackingParent = reference->keyframe->pose;
-	return toSophus(referenceToFrame.inverse());
+	
+    return toSophus(referenceToFrame.inverse());
 }
 
 

@@ -83,7 +83,7 @@ public:
 	// first frame will return Identity = camToWord.
 	// returns camToWord transformation of the tracked frame.
 	// frameID needs to be monotonically increasing.
-	void trackFrame(uchar* image, unsigned int frameID, bool blockUntilMapped, double timestamp);
+	void trackFrame(uchar* image, uchar* helpImage, unsigned int frameID, bool blockUntilMapped, double timestamp);
 
 	// finalizes the system, i.e. blocks and does all remaining loop-closures etc.
 	void finalize();
@@ -128,6 +128,10 @@ private:
 	TrackingReference* trackingReference; // tracking reference for current keyframe. only used by tracking.
 	SE3Tracker* tracker;
 
+    // edited by Tang Ning
+    TrackingReference* helpTrackingReference;
+    std::shared_ptr<Frame> helpCurrentKeyFrame;
+    SE3Tracker* helpTracker;
 
 
 	// ============= EXCLUSIVELY MAPPING THREAD (+ init) =============
@@ -180,6 +184,7 @@ private:
 	// Mapping: if (create) use candidate, reset create.
 	// => no locking required.
 	std::shared_ptr<Frame> latestTrackedFrame;
+    std::shared_ptr<Frame> latestTrackedHelpFrame;
 	bool createNewKeyFrame;
 
 
@@ -243,7 +248,7 @@ private:
 	void discardCurrentKeyframe();
 
 	void changeKeyframe(bool noCreate, bool force, float maxScore);
-	void createNewCurrentKeyframe(std::shared_ptr<Frame> newKeyframeCandidate);
+    void createNewCurrentKeyframe(std::shared_ptr<Frame> newKeyframeCandidate, std::shared_ptr<Frame> newHelpKeyframeCandidate);
 	void loadNewCurrentKeyframe(Frame* keyframeToLoad);
 
 

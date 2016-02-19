@@ -1,14 +1,17 @@
 {
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "FB6AFD483B4A931A7BB4A9503103F6E44FBC5310",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
 
   },
   "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
     "C85AEA5A1885E78772D71D8625802833294363E8" : 0,
+    "FB6AFD483B4A931A7BB4A9503103F6E44FBC5310" : 0,
     "9052B469DB1CEC5F8AD50EB92823D6431669AED1" : 0
   },
   "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "72012CD9-C0D2-46E0-9DA3-CBCD93FB9590",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
     "C85AEA5A1885E78772D71D8625802833294363E8" : "Pangolin\/",
+    "FB6AFD483B4A931A7BB4A9503103F6E44FBC5310" : "lsd-slam-pangolin\/",
     "9052B469DB1CEC5F8AD50EB92823D6431669AED1" : "g2o\/"
   },
   "DVTSourceControlWorkspaceBlueprintNameKey" : "lsd-slam-pangolin",
@@ -24,6 +27,11 @@
       "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/stevenlovegrove\/Pangolin.git",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "C85AEA5A1885E78772D71D8625802833294363E8"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:ningt\/lsd_slam_xcode.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "FB6AFD483B4A931A7BB4A9503103F6E44FBC5310"
     }
   ]
 }

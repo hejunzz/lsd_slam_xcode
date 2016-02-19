@@ -76,11 +76,17 @@ SlamSystem::SlamSystem(int w, int h, Eigen::Matrix3f K, bool enableSLAM)
 
 
 	tracker = new SE3Tracker(w,h,K);
+    // edited by Tang Ning
+    helpTracker = new SE3Tracker(w,h,K);
+    
 	// Do not use more than 4 levels for odometry tracking
 	for (int level = 4; level < PYRAMID_LEVELS; ++level)
 		tracker->settings.maxItsPerLvl[level] = 0;
 	trackingReference = new TrackingReference();
-	mappingTrackingReference = new TrackingReference();
+	// edited by Tang Ning
+    helpCurrentKeyFrame =  nullptr;
+    helpTrackingReference = new TrackingReference();
+    mappingTrackingReference = new TrackingReference();
 
 
 	if(SLAMEnabled)
@@ -151,6 +157,10 @@ SlamSystem::~SlamSystem()
 	delete map;
 	delete trackingReference;
 	delete tracker;
+    
+    // edited by Tang Ning
+    delete helpTrackingReference;
+    delete helpTracker;
 
 	// make shure to reset all shared pointers to all frames before deleting the keyframegraph!
 	unmappedTrackedFrames.clear();
@@ -454,7 +464,7 @@ void SlamSystem::discardCurrentKeyframe()
 
 }
 
-void SlamSystem::createNewCurrentKeyframe(std::shared_ptr<Frame> newKeyframeCandidate)
+void SlamSystem::createNewCurrentKeyframe(std::shared_ptr<Frame> newKeyframeCandidate, std::shared_ptr<Frame> newHelpKeyframeCandidate)
 {
 	if(enablePrintDebugInfo && printThreadingInfo)
 		printf("CREATE NEW KF %d from %d\n", newKeyframeCandidate->id(), currentKeyFrame->id());
@@ -485,6 +495,7 @@ void SlamSystem::createNewCurrentKeyframe(std::shared_ptr<Frame> newKeyframeCand
 
 	currentKeyFrameMutex.lock();
 	currentKeyFrame = newKeyframeCandidate;
+    helpCurrentKeyFrame = newHelpKeyframeCandidate;
 	currentKeyFrameMutex.unlock();
 }
 void SlamSystem::loadNewCurrentKeyframe(Frame* keyframeToLoad)
@@ -507,6 +518,7 @@ void SlamSystem::changeKeyframe(bool noCreate, bool force, float maxScore)
 {
 	Frame* newReferenceKF=0;
 	std::shared_ptr<Frame> newKeyframeCandidate = latestTrackedFrame;
+    std::shared_ptr<Frame> newHelpKeyframeCandidate = latestTrackedHelpFrame;
 	if(doKFReActivation && SLAMEnabled)
 	{
 		struct timeval tv_start, tv_end;
@@ -530,7 +542,7 @@ void SlamSystem::changeKeyframe(bool noCreate, bool force, float maxScore)
 				printf("mapping is disabled & moved outside of known map. Starting Relocalizer!\n");
 			}
 			else
-				createNewCurrentKeyframe(newKeyframeCandidate);
+				createNewCurrentKeyframe(newKeyframeCandidate, newHelpKeyframeCandidate);
 		}
 	}
 
@@ -886,10 +898,12 @@ void SlamSystem::randomInit(uchar* image, double timeStamp, int id)
 
 }
 
-void SlamSystem::trackFrame(uchar* image, unsigned int frameID, bool blockUntilMapped, double timestamp)
+void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID, bool blockUntilMapped, double timestamp)
 {
 	// Create new frame
 	std::shared_ptr<Frame> trackingNewFrame(new Frame(frameID, width, height, K, timestamp, image));
+    
+    std::shared_ptr<Frame> helpTrackingNewFrame(new Frame(frameID, width, height, K, timestamp, helpImage));
 
 	if(!trackingIsGood)
 	{
@@ -908,9 +922,15 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID, bool blockUntilM
 		trackingReference->importFrame(currentKeyFrame.get());
 		currentKeyFrame->depthHasBeenUpdatedFlag = false;
 		trackingReferenceFrameSharedPT = currentKeyFrame;
+        
+        if (useHelpSeq) {
+            helpTrackingReference->importFrame(helpCurrentKeyFrame.get());
+        }
 	}
-
+    
+    
 	FramePoseStruct* trackingReferencePose = trackingReference->keyframe->pose;
+    FramePoseStruct* helpTrackingReferencePose = helpTrackingReference->keyframe->pose;
 	currentKeyFrameMutex.unlock();
 
 	// DO TRACKING & Show tracking result.
@@ -921,7 +941,10 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID, bool blockUntilM
 	poseConsistencyMutex.lock_shared();
 	SE3 frameToReference_initialEstimate = se3FromSim3(
 			trackingReferencePose->getCamToWorld().inverse() * keyFrameGraph->allFramePoses.back()->getCamToWorld());
-	poseConsistencyMutex.unlock_shared();
+    // need some modification
+    SE3 helpFrameToReference_initialEstimate = se3FromSim3(
+            helpTrackingReferencePose->getCamToWorld().inverse() * keyFrameGraph->allFramePoses.back()->getCamToWorld());
+    poseConsistencyMutex.unlock_shared();
 
 
 
@@ -933,6 +956,14 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID, bool blockUntilM
 			trackingNewFrame.get(),
 			frameToReference_initialEstimate);
 
+    SE3 newRefToHelpFrame_poseUpdate;
+    
+    if (useHelpSeq) {
+        newRefToHelpFrame_poseUpdate = helpTracker->trackFrame(
+                helpTrackingReference,
+                helpTrackingNewFrame.get(),
+                helpFrameToReference_initialEstimate);
+    }
 
 	gettimeofday(&tv_end, NULL);
 	msTrackFrame = 0.9*msTrackFrame + 0.1*((tv_end.tv_sec-tv_start.tv_sec)*1000.0f + (tv_end.tv_usec-tv_start.tv_usec)/1000.0f);
@@ -946,23 +977,39 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID, bool blockUntilM
 
 	if(manualTrackingLossIndicated || tracker->diverged || (keyFrameGraph->keyframesAll.size() > INITIALIZATION_PHASE_COUNT && !tracker->trackingWasGood))
 	{
-		printf("TRACKING LOST for frame %d (%1.2f%% good Points, which is %1.2f%% of available points, %s)!\n",
-				trackingNewFrame->id(),
-				100*tracking_lastGoodPerTotal,
-				100*tracking_lastGoodPerBad,
-				tracker->diverged ? "DIVERGED" : "NOT DIVERGED");
-
-		trackingReference->invalidate();
-
-		trackingIsGood = false;
-		nextRelocIdx = -1;
-
-		unmappedTrackedFramesMutex.lock();
-		unmappedTrackedFramesSignal.notify_one();
-		unmappedTrackedFramesMutex.unlock();
-
-		manualTrackingLossIndicated = false;
-		return;
+        if (tracker->diverged && useHelpSeq) {
+            if (!tracker->diverged) {
+                trackingNewFrame->pose->trackingParent = helpTrackingReference->keyframe->pose;
+                trackingNewFrame->pose->thisToParent_raw = helpTrackingNewFrame->pose->thisToParent_raw;
+            }
+            else {
+                printf("HELP SEQ TRACKING LOST for frame %d (%1.2f%% good Points, which is %1.2f%% of available points, %s)!\n",
+                       trackingNewFrame->id(),
+                       100*tracking_lastGoodPerTotal,
+                       100*tracking_lastGoodPerBad,
+                       tracker->diverged ? "DIVERGED" : "NOT DIVERGED");
+                
+                helpTrackingReference->invalidate();
+            }
+        }
+        
+        printf("TRACKING LOST for frame %d (%1.2f%% good Points, which is %1.2f%% of available points, %s)!\n",
+               trackingNewFrame->id(),
+               100*tracking_lastGoodPerTotal,
+               100*tracking_lastGoodPerBad,
+               tracker->diverged ? "DIVERGED" : "NOT DIVERGED");
+        
+        trackingReference->invalidate();
+        
+        trackingIsGood = false;
+        nextRelocIdx = -1;
+        
+        unmappedTrackedFramesMutex.lock();
+        unmappedTrackedFramesSignal.notify_one();
+        unmappedTrackedFramesMutex.unlock();
+        
+        manualTrackingLossIndicated = false;
+        return;
 	}
 
 
@@ -994,6 +1041,7 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID, bool blockUntilM
 
 	// Keyframe selection
 	latestTrackedFrame = trackingNewFrame;
+    latestTrackedHelpFrame = helpTrackingNewFrame;
 	if (!my_createNewKeyframe && currentKeyFrame->numMappedOnThisTotal > MIN_NUM_MAPPED)
 	{
 		Sophus::Vector3d dist = newRefToFrame_poseUpdate.translation() * currentKeyFrame->meanIdepth;
@@ -1031,7 +1079,7 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID, bool blockUntilM
 		boost::unique_lock<boost::mutex> lock(newFrameMappedMutex);
 		while(unmappedTrackedFrames.size() > 0)
 		{
-			//printf("TRACKING IS BLOCKING, waiting for %d frames to finish mapping.\n", (int)unmappedTrackedFrames.size());
+			printf("TRACKING IS BLOCKING, waiting for %d frames to finish mapping.\n", (int)unmappedTrackedFrames.size());
 			newFrameMappedSignal.wait(lock);
 		}
 		lock.unlock();

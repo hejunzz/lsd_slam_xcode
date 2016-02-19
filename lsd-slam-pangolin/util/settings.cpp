@@ -88,7 +88,8 @@ bool multiThreading = true;
 bool useAffineLightningEstimation = true;
 
 
-
+// edited by Tang Ning
+bool useHelpSeq = false;
 bool useFabMap = false;
 bool doSlam = true;
 bool doKFReActivation = true;

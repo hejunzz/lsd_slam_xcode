@@ -237,6 +237,8 @@ extern float minUseGrad;
 extern float cameraPixelNoise2;
 extern float depthSmoothingFactor;
 
+// edited by Tang Ning
+extern bool useHelpSeq;
 extern bool useFabMap;
 extern bool doSlam;
 extern bool doKFReActivation;
