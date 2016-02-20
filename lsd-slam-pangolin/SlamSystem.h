@@ -132,6 +132,7 @@ private:
     TrackingReference* helpTrackingReference;
     std::shared_ptr<Frame> helpCurrentKeyFrame;
     SE3Tracker* helpTracker;
+    FramePoseStruct* prevHelpTrackedFrame;
 
 
 	// ============= EXCLUSIVELY MAPPING THREAD (+ init) =============

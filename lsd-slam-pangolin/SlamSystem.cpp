@@ -950,7 +950,7 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
     SE3 helpFrameToReference_initialEstimate;
     if (useHelpSeq)
         helpFrameToReference_initialEstimate = se3FromSim3(
-            helpTrackingReferencePose->getCamToWorld().inverse() * keyFrameGraph->allFramePoses.back()->getCamToWorld());
+            helpTrackingReferencePose->getCamToWorld().inverse() * prevHelpTrackedFrame->getCamToWorld());
     
     poseConsistencyMutex.unlock_shared();
 
@@ -1038,6 +1038,7 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
 	}
 
 	keyFrameGraph->addFrame(trackingNewFrame.get());
+    prevHelpTrackedFrame = helpTrackingNewFrame.get()->pose;
 
 
 	//Sim3 lastTrackedCamToWorld = mostCurrentTrackedFrame->getScaledCamToWorld();//  mostCurrentTrackedFrame->TrackingParent->getScaledCamToWorld() * sim3FromSE3(mostCurrentTrackedFrame->thisToParent_SE3TrackingResult, 1.0);
