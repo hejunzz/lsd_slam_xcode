@@ -519,7 +519,8 @@ void SlamSystem::changeKeyframe(bool noCreate, bool force, float maxScore)
 	Frame* newReferenceKF=0;
 	std::shared_ptr<Frame> newKeyframeCandidate = latestTrackedFrame;
     std::shared_ptr<Frame> newHelpKeyframeCandidate = latestTrackedHelpFrame;
-	if(doKFReActivation && SLAMEnabled)
+	
+    if(doKFReActivation && SLAMEnabled)
 	{
 		struct timeval tv_start, tv_end;
 		gettimeofday(&tv_start, NULL);
