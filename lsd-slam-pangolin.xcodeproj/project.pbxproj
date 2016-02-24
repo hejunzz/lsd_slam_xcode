@@ -46,6 +46,9 @@
 		0A3D02091C5748E500B387CC /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A3D02081C5748E500B387CC /* OpenGL.framework */; };
 		0A3D02481C5792A600B387CC /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A3D02471C5792A600B387CC /* libz.tbd */; };
 		0AC775D41C587289009E7A6C /* libg2o_types_sba.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A3D02621C579C4700B387CC /* libg2o_types_sba.dylib */; };
+		0ACB870E1C7D576B00259502 /* libg2o_csparse_extension.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0ACB870D1C7D576B00259502 /* libg2o_csparse_extension.dylib */; };
+		0ACB87131C7D5B6100259502 /* libg2o_solver_csparse.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0ACB870F1C7D5A5700259502 /* libg2o_solver_csparse.dylib */; };
+		0ACB87161C7D5D6900259502 /* libg2o_stuff.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A3D025E1C579C4700B387CC /* libg2o_stuff.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -142,7 +145,10 @@
 		0A3D02471C5792A600B387CC /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		0A3D025E1C579C4700B387CC /* libg2o_stuff.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libg2o_stuff.dylib; path = ../g2o/lib/libg2o_stuff.dylib; sourceTree = "<group>"; };
 		0A3D02621C579C4700B387CC /* libg2o_types_sba.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libg2o_types_sba.dylib; path = ../g2o/lib/libg2o_types_sba.dylib; sourceTree = "<group>"; };
-		0AC775CF1C585958009E7A6C /* libsuitesparseconfig.4.4.4.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsuitesparseconfig.4.4.4.a; path = "../../../../usr/local/Cellar/suite-sparse/4.4.4_2/lib/libsuitesparseconfig.4.4.4.a"; sourceTree = "<group>"; };
+		0ACB870D1C7D576B00259502 /* libg2o_csparse_extension.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libg2o_csparse_extension.dylib; path = ../g2o/lib/libg2o_csparse_extension.dylib; sourceTree = "<group>"; };
+		0ACB870F1C7D5A5700259502 /* libg2o_solver_csparse.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libg2o_solver_csparse.dylib; path = ../g2o/lib/libg2o_solver_csparse.dylib; sourceTree = "<group>"; };
+		0ACB87111C7D5B3A00259502 /* libg2o_solver_cholmod.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libg2o_solver_cholmod.dylib; path = ../g2o/lib/libg2o_solver_cholmod.dylib; sourceTree = "<group>"; };
+		0ACB87141C7D5B7300259502 /* libg2o_ext_csparse.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libg2o_ext_csparse.dylib; path = ../g2o/lib/libg2o_ext_csparse.dylib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,6 +156,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0ACB87161C7D5D6900259502 /* libg2o_stuff.dylib in Frameworks */,
+				0ACB87131C7D5B6100259502 /* libg2o_solver_csparse.dylib in Frameworks */,
+				0ACB870E1C7D576B00259502 /* libg2o_csparse_extension.dylib in Frameworks */,
 				0AC775D41C587289009E7A6C /* libg2o_types_sba.dylib in Frameworks */,
 				0A3D02041C5748A600B387CC /* libg2o_core.dylib in Frameworks */,
 				0A3D02481C5792A600B387CC /* libz.tbd in Frameworks */,
@@ -317,7 +326,10 @@
 		0A3DFFFD1C57063700B387CC = {
 			isa = PBXGroup;
 			children = (
-				0AC775CF1C585958009E7A6C /* libsuitesparseconfig.4.4.4.a */,
+				0ACB87141C7D5B7300259502 /* libg2o_ext_csparse.dylib */,
+				0ACB87111C7D5B3A00259502 /* libg2o_solver_cholmod.dylib */,
+				0ACB870F1C7D5A5700259502 /* libg2o_solver_csparse.dylib */,
+				0ACB870D1C7D576B00259502 /* libg2o_csparse_extension.dylib */,
 				0A3D025E1C579C4700B387CC /* libg2o_stuff.dylib */,
 				0A3D02621C579C4700B387CC /* libg2o_types_sba.dylib */,
 				0A3D02471C5792A600B387CC /* libz.tbd */,
@@ -526,10 +538,11 @@
 					/Users/ningt/Development/g2o,
 					/usr/local/Cellar/glm/0.9.7.1/include,
 					"/Users/ningt/Development/lsd-slam-pangolin/lsd-slam-pangolin",
-					/Users/ningt/Development/g2o/EXTERNAL/csparse,
 					/usr/include,
 					"/usr/local/Cellar/suite-sparse/4.4.4_2/include",
 					/Users/ningt/Development/g2o/build,
+					/Users/ningt/Development/g2o/g2o/solvers/csparse,
+					/Users/ningt/Development/monotonic_time,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/lib,
@@ -569,10 +582,11 @@
 					/Users/ningt/Development/g2o,
 					/usr/local/Cellar/glm/0.9.7.1/include,
 					"/Users/ningt/Development/lsd-slam-pangolin/lsd-slam-pangolin",
-					/Users/ningt/Development/g2o/EXTERNAL/csparse,
 					/usr/include,
 					"/usr/local/Cellar/suite-sparse/4.4.4_2/include",
 					/Users/ningt/Development/g2o/build,
+					/Users/ningt/Development/g2o/g2o/solvers/csparse,
+					/Users/ningt/Development/monotonic_time,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/lib,

@@ -65,18 +65,18 @@ KFConstraintStruct::~KFConstraintStruct()
 KeyFrameGraph::KeyFrameGraph()
 : nextEdgeId(0)
 {
-//	typedef g2o::BlockSolver_7_3 BlockSolver;
-//	typedef g2o::LinearSolverCSparse<BlockSolver::PoseMatrixType> LinearSolver;
+	typedef g2o::BlockSolver_7_3 BlockSolver;
+	typedef g2o::LinearSolverCSparse<BlockSolver::PoseMatrixType> LinearSolver;
 	//typedef g2o::LinearSolverPCG<BlockSolver::PoseMatrixType> LinearSolver;
-//	LinearSolver* solver = new LinearSolver();
-//	BlockSolver* blockSolver = new BlockSolver(solver);
-//	g2o::OptimizationAlgorithmLevenberg* algorithm = new g2o::OptimizationAlgorithmLevenberg(blockSolver);
-//	graph.setAlgorithm(algorithm);
+	LinearSolver* solver = new LinearSolver();
+	BlockSolver* blockSolver = new BlockSolver(solver);
+	g2o::OptimizationAlgorithmLevenberg* algorithm = new g2o::OptimizationAlgorithmLevenberg(blockSolver);
+	graph.setAlgorithm(algorithm);
 	
-//    graph.setVerbose(false); // printOptimizationInfo
-//	solver->setWriteDebug(true);
-//	blockSolver->setWriteDebug(true);
-//	algorithm->setWriteDebug(true);
+    graph.setVerbose(false); // printOptimizationInfo
+	solver->setWriteDebug(true);
+	blockSolver->setWriteDebug(true);
+	algorithm->setWriteDebug(true);
 
 
 	totalPoints=0;
@@ -300,7 +300,7 @@ bool KeyFrameGraph::addElementsFromBuffer()
 	keyframesForRetrackMutex.lock();
 	for (auto newKF : newKeyframesBuffer)
 	{
-//		graph.addVertex(newKF->pose->graphVertex);
+		graph.addVertex(newKF->pose->graphVertex);
 		assert(!newKF->pose->isInGraph);
 		newKF->pose->isInGraph = true;
 
@@ -313,7 +313,7 @@ bool KeyFrameGraph::addElementsFromBuffer()
 	newKeyframesBuffer.clear();
 	for (auto edge : newEdgeBuffer)
 	{
-//		graph.addEdge(edge->edge);
+		graph.addEdge(edge->edge);
 		added = true;
 	}
 	newEdgeBuffer.clear();
@@ -324,15 +324,15 @@ bool KeyFrameGraph::addElementsFromBuffer()
 int KeyFrameGraph::optimize(int num_iterations)
 {
 	// Abort if graph is empty, g2o shows an error otherwise
-//	if (graph.edges().size() == 0)
-//		return 0;
+	if (graph.edges().size() == 0)
+		return 0;
 	
-//	graph.setVerbose(false); // printOptimizationInfo
-//	graph.initializeOptimization();
+	graph.setVerbose(false); // printOptimizationInfo
+	graph.initializeOptimization();
 	
 
-//	return graph.optimize(num_iterations, false);
-    return 0; // added by tangning
+	return graph.optimize(num_iterations, false);
+//    return 0; // added by tangning
 }
 
 

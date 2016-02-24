@@ -518,12 +518,12 @@ dependencies: \
   /usr/local/Cellar/eigen/3.2.6/include/eigen3/Eigen/src/Core/ArrayWrapper.h \
   /usr/local/Cellar/eigen/3.2.6/include/eigen3/Eigen/src/Core/GlobalFunctions.h \
   /usr/local/Cellar/eigen/3.2.6/include/eigen3/Eigen/src/Core/util/ReenableStupidWarnings.h \
-  /Users/ningt/Development/g2o/g2o/core/sparse_optimizer.h \
-  /Users/ningt/Development/g2o/g2o/stuff/macros.h \
-  /Users/ningt/Development/g2o/g2o/core/optimizable_graph.h \
-  /Users/ningt/Development/g2o/g2o/core/openmp_mutex.h \
-  /Users/ningt/Development/g2o/build/g2o/config.h \
-  /Users/ningt/Development/g2o/g2o/core/eigen_types.h \
+  /usr/local/include/g2o/core/sparse_optimizer.h \
+  /usr/local/include/g2o/stuff/macros.h \
+  /usr/local/include/g2o/core/optimizable_graph.h \
+  /usr/local/include/g2o/core/openmp_mutex.h \
+  /usr/local/include/g2o/config.h \
+  /usr/local/include/g2o/core/eigen_types.h \
   /usr/local/Cellar/eigen/3.2.6/include/eigen3/Eigen/Geometry \
   /usr/local/Cellar/eigen/3.2.6/include/eigen3/Eigen/SVD \
   /usr/local/Cellar/eigen/3.2.6/include/eigen3/Eigen/QR \
@@ -565,20 +565,20 @@ dependencies: \
   /usr/local/Cellar/eigen/3.2.6/include/eigen3/Eigen/src/Geometry/AlignedBox.h \
   /usr/local/Cellar/eigen/3.2.6/include/eigen3/Eigen/src/Geometry/Umeyama.h \
   /usr/local/Cellar/eigen/3.2.6/include/eigen3/Eigen/src/Geometry/arch/Geometry_SSE.h \
-  /Users/ningt/Development/g2o/g2o/core/hyper_graph.h \
-  /Users/ningt/Development/g2o/g2o/core/g2o_core_api.h \
-  /Users/ningt/Development/g2o/g2o/core/parameter.h \
-  /Users/ningt/Development/g2o/g2o/core/parameter_container.h \
-  /Users/ningt/Development/g2o/g2o/core/jacobian_workspace.h \
+  /usr/local/include/g2o/core/hyper_graph.h \
+  /usr/local/include/g2o/core/g2o_core_api.h \
+  /usr/local/include/g2o/core/parameter.h \
+  /usr/local/include/g2o/core/parameter_container.h \
+  /usr/local/include/g2o/core/jacobian_workspace.h \
   /usr/local/Cellar/eigen/3.2.6/include/eigen3/Eigen/StdVector \
   /usr/local/Cellar/eigen/3.2.6/include/eigen3/Eigen/src/StlSupport/StdVector.h \
   /usr/local/Cellar/eigen/3.2.6/include/eigen3/Eigen/src/StlSupport/details.h \
-  /Users/ningt/Development/g2o/g2o/core/sparse_block_matrix.h \
-  /Users/ningt/Development/g2o/g2o/core/sparse_block_matrix_ccs.h \
-  /Users/ningt/Development/g2o/g2o/core/matrix_operations.h \
-  /Users/ningt/Development/g2o/g2o/core/matrix_structure.h \
-  /Users/ningt/Development/g2o/g2o/core/sparse_block_matrix.hpp \
-  /Users/ningt/Development/g2o/g2o/core/batch_stats.h \
+  /usr/local/include/g2o/core/sparse_block_matrix.h \
+  /usr/local/include/g2o/core/sparse_block_matrix_ccs.h \
+  /usr/local/include/g2o/core/matrix_operations.h \
+  /usr/local/include/g2o/core/matrix_structure.h \
+  /usr/local/include/g2o/core/sparse_block_matrix.hpp \
+  /usr/local/include/g2o/core/batch_stats.h \
   /Users/ningt/Development/lsd-slam-pangolin/lsd-slam-pangolin/util/SophusUtil.h \
   /Users/ningt/Development/lsd-slam-pangolin/lsd-slam-pangolin/thirdparty/Sophus/sophus/sim3.hpp \
   /Users/ningt/Development/lsd-slam-pangolin/lsd-slam-pangolin/thirdparty/Sophus/sophus/rxso3.hpp \
@@ -605,50 +605,50 @@ dependencies: \
   /usr/local/include/boost/thread/pthread/recursive_mutex.hpp \
   /Users/ningt/Development/lsd-slam-pangolin/lsd-slam-pangolin/DataStructures/FramePoseStruct.h \
   /Users/ningt/Development/lsd-slam-pangolin/lsd-slam-pangolin/GlobalMapping/g2oTypeSim3Sophus.h \
-  /Users/ningt/Development/g2o/g2o/core/base_vertex.h \
-  /Users/ningt/Development/g2o/g2o/core/creators.h \
-  /Users/ningt/Development/g2o/g2o/core/base_vertex.hpp \
-  /Users/ningt/Development/g2o/g2o/core/base_binary_edge.h \
-  /Users/ningt/Development/g2o/g2o/core/base_edge.h \
-  /Users/ningt/Development/g2o/g2o/core/robust_kernel.h \
-  /Users/ningt/Development/g2o/g2o/core/base_binary_edge.hpp \
-  /Users/ningt/Development/g2o/g2o/types/sba/types_six_dof_expmap.h \
-  /Users/ningt/Development/g2o/g2o/types/slam3d/se3_ops.h \
-  /Users/ningt/Development/g2o/g2o/types/slam3d/g2o_types_slam3d_api.h \
-  /Users/ningt/Development/g2o/g2o/types/slam3d/se3_ops.hpp \
-  /Users/ningt/Development/g2o/g2o/types/sba/types_sba.h \
-  /Users/ningt/Development/g2o/g2o/core/base_multi_edge.h \
-  /Users/ningt/Development/g2o/g2o/core/base_multi_edge.hpp \
-  /Users/ningt/Development/g2o/g2o/types/sba/sbacam.h \
-  /Users/ningt/Development/g2o/g2o/stuff/misc.h \
-  /Users/ningt/Development/g2o/g2o/types/slam3d/se3quat.h \
-  /Users/ningt/Development/g2o/g2o/types/sba/g2o_types_sba_api.h \
+  /usr/local/include/g2o/core/base_vertex.h \
+  /usr/local/include/g2o/core/creators.h \
+  /usr/local/include/g2o/core/base_vertex.hpp \
+  /usr/local/include/g2o/core/base_binary_edge.h \
+  /usr/local/include/g2o/core/base_edge.h \
+  /usr/local/include/g2o/core/robust_kernel.h \
+  /usr/local/include/g2o/core/base_binary_edge.hpp \
+  /usr/local/include/g2o/types/sba/types_six_dof_expmap.h \
+  /usr/local/include/g2o/types/slam3d/se3_ops.h \
+  /usr/local/include/g2o/types/slam3d/g2o_types_slam3d_api.h \
+  /usr/local/include/g2o/types/slam3d/se3_ops.hpp \
+  /usr/local/include/g2o/types/sba/types_sba.h \
+  /usr/local/include/g2o/core/base_multi_edge.h \
+  /usr/local/include/g2o/core/base_multi_edge.hpp \
+  /usr/local/include/g2o/types/sba/sbacam.h \
+  /usr/local/include/g2o/stuff/misc.h \
+  /usr/local/include/g2o/types/slam3d/se3quat.h \
+  /usr/local/include/g2o/types/sba/g2o_types_sba_api.h \
   /Users/ningt/Development/lsd-slam-pangolin/lsd-slam-pangolin/DataStructures/FrameMemory.h \
-  /Users/ningt/Development/g2o/g2o/solvers/pcg/linear_solver_pcg.h \
-  /Users/ningt/Development/g2o/g2o/core/linear_solver.h \
-  /Users/ningt/Development/g2o/g2o/solvers/pcg/linear_solver_pcg.hpp \
-  /Users/ningt/Development/g2o/g2o/solvers/csparse/linear_solver_csparse.h \
-  /Users/ningt/Development/g2o/g2o/solvers/csparse/csparse_helper.h \
+  /usr/local/include/g2o/solvers/pcg/linear_solver_pcg.h \
+  /usr/local/include/g2o/core/linear_solver.h \
+  /usr/local/include/g2o/solvers/pcg/linear_solver_pcg.hpp \
+  /usr/local/include/g2o/solvers/csparse/linear_solver_csparse.h \
+  /usr/local/include/g2o/solvers/csparse/csparse_helper.h \
   /usr/local/include/cs.h /usr/local/include/SuiteSparse_config.h \
-  /Users/ningt/Development/g2o/g2o/solvers/csparse/g2o_csparse_extension_api.h \
-  /Users/ningt/Development/g2o/g2o/core/marginal_covariance_cholesky.h \
-  /Users/ningt/Development/g2o/g2o/stuff/timeutil.h \
-  /Users/ningt/Development/g2o/g2o/stuff/g2o_stuff_api.h \
-  /Users/ningt/Development/g2o/g2o/solvers/csparse/g2o_csparse_api.h \
-  /Users/ningt/Development/g2o/g2o/core/block_solver.h \
-  /Users/ningt/Development/g2o/g2o/core/solver.h \
-  /Users/ningt/Development/g2o/g2o/core/sparse_block_matrix_diagonal.h \
-  /Users/ningt/Development/g2o/g2o/core/block_solver.hpp \
-  /Users/ningt/Development/g2o/g2o/core/optimization_algorithm_dogleg.h \
-  /Users/ningt/Development/g2o/g2o/core/optimization_algorithm_with_hessian.h \
-  /Users/ningt/Development/g2o/g2o/core/optimization_algorithm.h \
-  /Users/ningt/Development/g2o/g2o/stuff/property.h \
-  /Users/ningt/Development/g2o/g2o/stuff/string_tools.h \
-  /Users/ningt/Development/g2o/g2o/core/optimization_algorithm_levenberg.h \
-  /Users/ningt/Development/g2o/g2o/core/robust_kernel_impl.h \
-  /Users/ningt/Development/g2o/g2o/core/estimate_propagator.h \
-  /Users/ningt/Development/g2o/g2o/core/sparse_optimizer_terminate_action.h \
-  /Users/ningt/Development/g2o/g2o/core/hyper_graph_action.h \
+  /usr/local/include/g2o/solvers/csparse/g2o_csparse_extension_api.h \
+  /usr/local/include/g2o/core/marginal_covariance_cholesky.h \
+  /usr/local/include/g2o/stuff/timeutil.h \
+  /usr/local/include/g2o/stuff/g2o_stuff_api.h \
+  /usr/local/include/g2o/solvers/csparse/g2o_csparse_api.h \
+  /usr/local/include/g2o/core/block_solver.h \
+  /usr/local/include/g2o/core/solver.h \
+  /usr/local/include/g2o/core/sparse_block_matrix_diagonal.h \
+  /usr/local/include/g2o/core/block_solver.hpp \
+  /usr/local/include/g2o/core/optimization_algorithm_dogleg.h \
+  /usr/local/include/g2o/core/optimization_algorithm_with_hessian.h \
+  /usr/local/include/g2o/core/optimization_algorithm.h \
+  /usr/local/include/g2o/stuff/property.h \
+  /usr/local/include/g2o/stuff/string_tools.h \
+  /usr/local/include/g2o/core/optimization_algorithm_levenberg.h \
+  /usr/local/include/g2o/core/robust_kernel_impl.h \
+  /usr/local/include/g2o/core/estimate_propagator.h \
+  /usr/local/include/g2o/core/sparse_optimizer_terminate_action.h \
+  /usr/local/include/g2o/core/hyper_graph_action.h \
   /usr/local/include/opencv2/opencv.hpp \
   /usr/local/include/opencv2/core/core_c.h \
   /usr/local/include/opencv2/core/types_c.h \
@@ -677,7 +677,7 @@ dependencies: \
   /usr/local/include/opencv2/contrib/contrib.hpp \
   /usr/local/include/opencv2/contrib/retina.hpp \
   /usr/local/include/opencv2/contrib/openfabmap.hpp \
-  /Users/ningt/Development/g2o/g2o/types/sim3/sim3.h \
+  /usr/local/include/g2o/types/sim3/sim3.h \
   /Users/ningt/Development/lsd-slam-pangolin/lsd-slam-pangolin/IOWrapper/ImageDisplay.h \
   /Users/ningt/Development/lsd-slam-pangolin/lsd-slam-pangolin/util/globalFuncs.h \
   /Users/ningt/Development/lsd-slam-pangolin/lsd-slam-pangolin/IOWrapper/TimestampedObject.h \

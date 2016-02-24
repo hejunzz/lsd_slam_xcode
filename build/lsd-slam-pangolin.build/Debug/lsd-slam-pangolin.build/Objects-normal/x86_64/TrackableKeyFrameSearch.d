@@ -584,46 +584,46 @@ dependencies: \
   /usr/local/include/boost/smart_ptr/weak_ptr.hpp \
   /usr/local/include/boost/thread/detail/thread_interruption.hpp \
   /Users/ningt/Development/lsd-slam-pangolin/lsd-slam-pangolin/util/EigenCoreInclude.h \
-  /Users/ningt/Development/g2o/g2o/core/sparse_optimizer.h \
-  /Users/ningt/Development/g2o/g2o/stuff/macros.h \
-  /Users/ningt/Development/g2o/g2o/core/optimizable_graph.h \
-  /Users/ningt/Development/g2o/g2o/core/openmp_mutex.h \
-  /Users/ningt/Development/g2o/build/g2o/config.h \
-  /Users/ningt/Development/g2o/g2o/core/eigen_types.h \
-  /Users/ningt/Development/g2o/g2o/core/hyper_graph.h \
-  /Users/ningt/Development/g2o/g2o/core/g2o_core_api.h \
-  /Users/ningt/Development/g2o/g2o/core/parameter.h \
-  /Users/ningt/Development/g2o/g2o/core/parameter_container.h \
-  /Users/ningt/Development/g2o/g2o/core/jacobian_workspace.h \
-  /Users/ningt/Development/g2o/g2o/core/sparse_block_matrix.h \
-  /Users/ningt/Development/g2o/g2o/core/sparse_block_matrix_ccs.h \
-  /Users/ningt/Development/g2o/g2o/core/matrix_operations.h \
-  /Users/ningt/Development/g2o/g2o/core/matrix_structure.h \
-  /Users/ningt/Development/g2o/g2o/core/sparse_block_matrix.hpp \
-  /Users/ningt/Development/g2o/g2o/core/batch_stats.h \
+  /usr/local/include/g2o/core/sparse_optimizer.h \
+  /usr/local/include/g2o/stuff/macros.h \
+  /usr/local/include/g2o/core/optimizable_graph.h \
+  /usr/local/include/g2o/core/openmp_mutex.h \
+  /usr/local/include/g2o/config.h \
+  /usr/local/include/g2o/core/eigen_types.h \
+  /usr/local/include/g2o/core/hyper_graph.h \
+  /usr/local/include/g2o/core/g2o_core_api.h \
+  /usr/local/include/g2o/core/parameter.h \
+  /usr/local/include/g2o/core/parameter_container.h \
+  /usr/local/include/g2o/core/jacobian_workspace.h \
+  /usr/local/include/g2o/core/sparse_block_matrix.h \
+  /usr/local/include/g2o/core/sparse_block_matrix_ccs.h \
+  /usr/local/include/g2o/core/matrix_operations.h \
+  /usr/local/include/g2o/core/matrix_structure.h \
+  /usr/local/include/g2o/core/sparse_block_matrix.hpp \
+  /usr/local/include/g2o/core/batch_stats.h \
   /Users/ningt/Development/lsd-slam-pangolin/lsd-slam-pangolin/DataStructures/Frame.h \
   /usr/local/include/boost/thread/recursive_mutex.hpp \
   /usr/local/include/boost/thread/pthread/recursive_mutex.hpp \
   /Users/ningt/Development/lsd-slam-pangolin/lsd-slam-pangolin/DataStructures/FramePoseStruct.h \
   /Users/ningt/Development/lsd-slam-pangolin/lsd-slam-pangolin/GlobalMapping/g2oTypeSim3Sophus.h \
-  /Users/ningt/Development/g2o/g2o/core/base_vertex.h \
-  /Users/ningt/Development/g2o/g2o/core/creators.h \
-  /Users/ningt/Development/g2o/g2o/core/base_vertex.hpp \
-  /Users/ningt/Development/g2o/g2o/core/base_binary_edge.h \
-  /Users/ningt/Development/g2o/g2o/core/base_edge.h \
-  /Users/ningt/Development/g2o/g2o/core/robust_kernel.h \
-  /Users/ningt/Development/g2o/g2o/core/base_binary_edge.hpp \
-  /Users/ningt/Development/g2o/g2o/types/sba/types_six_dof_expmap.h \
-  /Users/ningt/Development/g2o/g2o/types/slam3d/se3_ops.h \
-  /Users/ningt/Development/g2o/g2o/types/slam3d/g2o_types_slam3d_api.h \
-  /Users/ningt/Development/g2o/g2o/types/slam3d/se3_ops.hpp \
-  /Users/ningt/Development/g2o/g2o/types/sba/types_sba.h \
-  /Users/ningt/Development/g2o/g2o/core/base_multi_edge.h \
-  /Users/ningt/Development/g2o/g2o/core/base_multi_edge.hpp \
-  /Users/ningt/Development/g2o/g2o/types/sba/sbacam.h \
-  /Users/ningt/Development/g2o/g2o/stuff/misc.h \
-  /Users/ningt/Development/g2o/g2o/types/slam3d/se3quat.h \
-  /Users/ningt/Development/g2o/g2o/types/sba/g2o_types_sba_api.h \
+  /usr/local/include/g2o/core/base_vertex.h \
+  /usr/local/include/g2o/core/creators.h \
+  /usr/local/include/g2o/core/base_vertex.hpp \
+  /usr/local/include/g2o/core/base_binary_edge.h \
+  /usr/local/include/g2o/core/base_edge.h \
+  /usr/local/include/g2o/core/robust_kernel.h \
+  /usr/local/include/g2o/core/base_binary_edge.hpp \
+  /usr/local/include/g2o/types/sba/types_six_dof_expmap.h \
+  /usr/local/include/g2o/types/slam3d/se3_ops.h \
+  /usr/local/include/g2o/types/slam3d/g2o_types_slam3d_api.h \
+  /usr/local/include/g2o/types/slam3d/se3_ops.hpp \
+  /usr/local/include/g2o/types/sba/types_sba.h \
+  /usr/local/include/g2o/core/base_multi_edge.h \
+  /usr/local/include/g2o/core/base_multi_edge.hpp \
+  /usr/local/include/g2o/types/sba/sbacam.h \
+  /usr/local/include/g2o/stuff/misc.h \
+  /usr/local/include/g2o/types/slam3d/se3quat.h \
+  /usr/local/include/g2o/types/sba/g2o_types_sba_api.h \
   /Users/ningt/Development/lsd-slam-pangolin/lsd-slam-pangolin/DataStructures/FrameMemory.h \
   /Users/ningt/Development/lsd-slam-pangolin/lsd-slam-pangolin/Tracking/SE3Tracker.h \
   /usr/local/include/opencv2/core/core.hpp \
