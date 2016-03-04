@@ -258,6 +258,8 @@ extern std::string packagePath;
 
 extern bool fullResetRequested;
 extern bool manualTrackingLossIndicated;
+extern bool takingScreenShot;
+
 class RunningStats
 {
 public:

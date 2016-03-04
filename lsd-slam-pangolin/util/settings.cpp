@@ -114,6 +114,7 @@ bool continuousPCOutput = false;
 bool fullResetRequested = false;
 bool manualTrackingLossIndicated = false;
 
+bool takingScreenShot = false;
 
 std::string packagePath = "";
 
@@ -156,6 +157,10 @@ void handleKey(char k)
 		printf("Manual Tracking Loss Indicated!\n");
 		manualTrackingLossIndicated = true;
 		break;
+    case 't': case 'T':
+        printf("Taking Screenshots!\n");
+        takingScreenShot = true;
+        break;
 	}
 
 }

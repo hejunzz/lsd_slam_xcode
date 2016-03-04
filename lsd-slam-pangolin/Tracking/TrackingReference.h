@@ -60,6 +60,7 @@ public:
 	int frameID;
 
 	void makePointCloud(int level);
+    void writePointCloud(std::string file, int level);
 	void clearAll();
 	void invalidate();
 	Eigen::Vector3f* posData[PYRAMID_LEVELS];	// (x,y,z)
