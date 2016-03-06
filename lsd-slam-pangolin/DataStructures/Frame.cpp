@@ -177,6 +177,7 @@ void Frame::calculateMeanInformation()
 {
 	return;
 
+    /*
 	if(numMappablePixels < 0)
 		maxGradients(0);
 
@@ -193,6 +194,7 @@ void Frame::calculateMeanInformation()
 	}
 
 	meanInformation = sum / goodpx;
+    */
 }
 
 

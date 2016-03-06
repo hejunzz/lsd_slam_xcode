@@ -96,8 +96,8 @@ namespace lsd_slam
         assert(keyframe != 0);
         boost::unique_lock<boost::mutex> lock(accessMutex);
         
-        if(numData[level] > 0)
-            return;	// already exists.
+        // if(numData[level] > 0)
+        //    return;	// already exists.
         
         int w = keyframe->width(level);
         int h = keyframe->height(level);
@@ -141,18 +141,18 @@ namespace lsd_slam
                 idxPT++;
             }
         
-        numData[level] = posDataPT - posData[level];
+        numData[level] = (int) (posDataPT - posData[level]);
     }
     
     void TrackingReference::writePointCloud(std::string file, int level) {
         std::ofstream output;
-        output.open (file);
+        output.open(file);
         output.precision(6);
         
         output << "3" << std::endl;
         Eigen::Vector3f* posDataPT = posData[level];
         
-        for (int i=0 ; i<numData[level] ; i++) {
+        for (int i=0 ; i<numData[level]; i++) {
             output << posDataPT[i][0] << " " << posDataPT[i][1] << " "  << posDataPT[i][2] << "\n";
         }
         output.close();

@@ -417,7 +417,7 @@ void SlamSystem::finishCurrentKeyframe()
 		if(currentKeyFrame->idxInKeyframes < 0)
 		{
 			keyFrameGraph->keyframesAllMutex.lock();
-			currentKeyFrame->idxInKeyframes = keyFrameGraph->keyframesAll.size();
+			currentKeyFrame->idxInKeyframes = (int) keyFrameGraph->keyframesAll.size();
 			keyFrameGraph->keyframesAll.push_back(currentKeyFrame.get());
 			keyFrameGraph->totalPoints += currentKeyFrame->numPoints;
 			keyFrameGraph->totalVertices ++;
@@ -666,8 +666,6 @@ void SlamSystem::addTimingSamples()
 
 void SlamSystem::debugDisplayDepthMap()
 {
-
-
 	map->debugPlotDepthMap();
 	double scale = 1;
 	if(currentKeyFrame != 0 && currentKeyFrame != 0)

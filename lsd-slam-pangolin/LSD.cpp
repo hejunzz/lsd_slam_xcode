@@ -86,7 +86,7 @@ int getdir (std::string dir, std::vector<std::string> &files)
 			files[i] = dir + files[i];
 	}
 
-    return files.size();
+    return (int)files.size();
 }
 
 int getFile (std::string source, std::vector<std::string> &files)
@@ -237,6 +237,12 @@ void run(SlamSystem * system, Undistorter* undistorter, Output3DWrapper* outputW
     lsdDone.assignValue(true);
 }
 
+void CallBackFunc(int event, int x, int y, int flags, void* userdata)
+{
+    printf("Taking Screenshots!\n");
+    takingScreenShot = true;
+}
+
 int main( int argc, char** argv )
 {
 	// get camera calibration in form of an undistorter object.
@@ -340,6 +346,9 @@ int main( int argc, char** argv )
     }
 
 	boost::thread lsdThread(run, system, undistorter, outputWrapper, K);
+    
+    cv::namedWindow("Main", 1);
+    cv::setMouseCallback("Main", CallBackFunc, NULL);
 
 	while(!pangolin::ShouldQuit())
 	{
