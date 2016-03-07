@@ -318,10 +318,13 @@ SE3 SE3Tracker::trackFrame(
 		numCalcResidualCalls[lvl] = 0;
 		numCalcWarpUpdateCalls[lvl] = 0;
 
-		reference->makePointCloud(lvl);
+        if (!useHelpSeq) {
+            reference->makePointCloud(lvl);
+        }
         
-        if (lvl == 1) {
+        if (lvl == 1 && takingScreenShot) {
             reference->writePointCloud("pointCloud" + std::to_string(frame->id()) + ".xyz", lvl);
+            takingScreenShot = false;
         }
 
 		callOptimized(calcResidualAndBuffers, (reference->posData[lvl], reference->colorAndVarData[lvl], SE3TRACKING_MIN_LEVEL == lvl ? reference->pointPosInXYGrid[lvl] : 0, reference->numData[lvl], frame, referenceToFrame, lvl, (plotTracking && lvl == SE3TRACKING_MIN_LEVEL)));

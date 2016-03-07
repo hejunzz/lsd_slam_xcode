@@ -207,13 +207,11 @@ void run(SlamSystem * system, Undistorter* undistorter, Output3DWrapper* outputW
 
         if(runningIDX == 0)
         {
-            system->randomInit(image.data, fakeTimeStamp, runningIDX);
+            system->randomInit(image.data, helpImage.data, fakeTimeStamp, runningIDX);
         }
         else
-        {   if (useHelpSeq)
-                system->trackFrame(image.data, helpImage.data, runningIDX, hz == 0, fakeTimeStamp);
-            else
-                system->trackFrame(image.data, image.data, runningIDX, hz == 0, fakeTimeStamp);
+        {
+            system->trackFrame(image.data, helpImage.data, runningIDX, hz == 0, fakeTimeStamp);
         }
 
         gui.pose.assignValue(system->getCurrentPoseEstimateScale());

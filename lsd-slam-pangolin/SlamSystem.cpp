@@ -868,7 +868,7 @@ void SlamSystem::gtDepthInit(uchar* image, float* depth, double timeStamp, int i
 }
 
 
-void SlamSystem::randomInit(uchar* image, double timeStamp, int id)
+void SlamSystem::randomInit(uchar* image, uchar* helpImage, double timeStamp, int id)
 {
 	printf("Doing Random initialization!\n");
 
@@ -881,6 +881,11 @@ void SlamSystem::randomInit(uchar* image, double timeStamp, int id)
 	currentKeyFrame.reset(new Frame(id, width, height, K, timeStamp, image));
 	map->initializeRandomly(currentKeyFrame.get());
 	keyFrameGraph->addFrame(currentKeyFrame.get());
+    
+    if (useHelpSeq) {
+        helpCurrentKeyFrame.reset(new Frame(id, width, height, K2, timeStamp, helpImage));
+        prevHelpTrackedFrame = helpCurrentKeyFrame.get()->pose;
+    }
 
 	currentKeyFrameMutex.unlock();
 
@@ -906,7 +911,7 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
 	// Create new frame
 	std::shared_ptr<Frame> trackingNewFrame(new Frame(frameID, width, height, K, timestamp, image));
     
-    std::shared_ptr<Frame> helpTrackingNewFrame(new Frame(frameID, width, height, K, timestamp, helpImage));
+    std::shared_ptr<Frame> helpTrackingNewFrame(new Frame(frameID, width, height, K2, timestamp, helpImage));
 
 	if(!trackingIsGood)
 	{
@@ -951,9 +956,10 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
 
     // need some modification
     SE3 helpFrameToReference_initialEstimate;
-    if (useHelpSeq)
+    if (useHelpSeq) {
         helpFrameToReference_initialEstimate = se3FromSim3(
             helpTrackingReferencePose->getCamToWorld().inverse() * prevHelpTrackedFrame->getCamToWorld());
+    }
     
     poseConsistencyMutex.unlock_shared();
 
@@ -968,7 +974,6 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
 			frameToReference_initialEstimate);
 
     SE3 newRefToHelpFrame_poseUpdate;
-    
     if (useHelpSeq) {
         newRefToHelpFrame_poseUpdate = helpTracker->trackFrame(
                 helpTrackingReference,
