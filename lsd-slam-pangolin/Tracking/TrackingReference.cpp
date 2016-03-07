@@ -96,8 +96,8 @@ namespace lsd_slam
         assert(keyframe != 0);
         boost::unique_lock<boost::mutex> lock(accessMutex);
         
-        // if(numData[level] > 0)
-        //    return;	// already exists.
+         if(numData[level] > 0)
+            return;	// already exists.
         
         int w = keyframe->width(level);
         int h = keyframe->height(level);

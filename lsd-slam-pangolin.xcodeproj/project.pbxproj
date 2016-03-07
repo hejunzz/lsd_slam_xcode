@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		0A3D007D1C57072800B387CC /* GUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A3D00721C57072800B387CC /* GUI.cpp */; };
-		0A3D007E1C57072800B387CC /* LiveSLAMWrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A3D00751C57072800B387CC /* LiveSLAMWrapper.cpp */; };
 		0A3D007F1C57072800B387CC /* LSD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A3D00771C57072800B387CC /* LSD.cpp */; };
 		0A3D00801C57072800B387CC /* SlamSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A3D00781C57072800B387CC /* SlamSystem.cpp */; };
 		0A3D00821C5718F800B387CC /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A3D00811C5718F800B387CC /* GLUT.framework */; };
@@ -68,8 +67,6 @@
 		0A3D00061C57063700B387CC /* lsd-slam-pangolin */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "lsd-slam-pangolin"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A3D00721C57072800B387CC /* GUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GUI.cpp; sourceTree = "<group>"; };
 		0A3D00731C57072800B387CC /* GUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUI.h; sourceTree = "<group>"; };
-		0A3D00751C57072800B387CC /* LiveSLAMWrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LiveSLAMWrapper.cpp; sourceTree = "<group>"; };
-		0A3D00761C57072800B387CC /* LiveSLAMWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LiveSLAMWrapper.h; sourceTree = "<group>"; };
 		0A3D00771C57072800B387CC /* LSD.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LSD.cpp; sourceTree = "<group>"; };
 		0A3D00781C57072800B387CC /* SlamSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SlamSystem.cpp; sourceTree = "<group>"; };
 		0A3D00791C57072800B387CC /* SlamSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SlamSystem.h; sourceTree = "<group>"; };
@@ -198,8 +195,6 @@
 				0A3D009C1C5723C900B387CC /* DataStructure */,
 				0A3D00721C57072800B387CC /* GUI.cpp */,
 				0A3D00731C57072800B387CC /* GUI.h */,
-				0A3D00751C57072800B387CC /* LiveSLAMWrapper.cpp */,
-				0A3D00761C57072800B387CC /* LiveSLAMWrapper.h */,
 				0A3D00771C57072800B387CC /* LSD.cpp */,
 				0A3D00781C57072800B387CC /* SlamSystem.cpp */,
 				0A3D00791C57072800B387CC /* SlamSystem.h */,
@@ -416,7 +411,6 @@
 				0A3D00B41C57247600B387CC /* DepthMap.cpp in Sources */,
 				0A3D00C21C57249200B387CC /* TrackableKeyFrameSearch.cpp in Sources */,
 				0A3D00BF1C57249200B387CC /* FabMap.cpp in Sources */,
-				0A3D007E1C57072800B387CC /* LiveSLAMWrapper.cpp in Sources */,
 				0A3D00DB1C5724CB00B387CC /* Undistorter.cpp in Sources */,
 				0A3D00E61C5724E500B387CC /* SE3Tracker.cpp in Sources */,
 				0A3D00E81C5724E500B387CC /* TrackingReference.cpp in Sources */,

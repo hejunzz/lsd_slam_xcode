@@ -25,7 +25,7 @@
 #include "Tracking/Sim3Tracker.h"
 #include "DepthEstimation/DepthMap.h"
 #include "Tracking/TrackingReference.h"
-#include "LiveSLAMWrapper.h"
+// #include "LiveSLAMWrapper.h"
 #include "util/globalFuncs.h"
 #include "GlobalMapping/KeyFrameGraph.h"
 #include "GlobalMapping/TrackableKeyFrameSearch.h"
@@ -49,7 +49,7 @@
 using namespace lsd_slam;
 
 
-SlamSystem::SlamSystem(int w, int h, Eigen::Matrix3f K, bool enableSLAM)
+SlamSystem::SlamSystem(int w, int h, Eigen::Matrix3f K, Eigen::Matrix3f K2, bool enableSLAM)
 : SLAMEnabled(enableSLAM), finalized(false), relocalizer(w,h,K)
 {
 	if(w%16 != 0 || h%16!=0)
@@ -61,6 +61,7 @@ SlamSystem::SlamSystem(int w, int h, Eigen::Matrix3f K, bool enableSLAM)
 	this->width = w;
 	this->height = h;
 	this->K = K;
+    this->K2 = K2;
 	trackingIsGood = true;
 
 
@@ -76,14 +77,17 @@ SlamSystem::SlamSystem(int w, int h, Eigen::Matrix3f K, bool enableSLAM)
 
 
 	tracker = new SE3Tracker(w,h,K);
-    // edited by Tang Ning
-    helpTracker = new SE3Tracker(w,h,K);
+    
+    if (useHelpSeq) {
+        helpTracker = new SE3Tracker(w,h,K2);
+    }
     
 	// Do not use more than 4 levels for odometry tracking
 	for (int level = 4; level < PYRAMID_LEVELS; ++level)
 		tracker->settings.maxItsPerLvl[level] = 0;
 	trackingReference = new TrackingReference();
-	// edited by Tang Ning
+	
+    // edited by Tang Ning
     helpCurrentKeyFrame =  nullptr;
     helpTrackingReference = new TrackingReference();
     mappingTrackingReference = new TrackingReference();

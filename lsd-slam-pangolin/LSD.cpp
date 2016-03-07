@@ -18,7 +18,7 @@
 * along with LSD-SLAM. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "LiveSLAMWrapper.h"
+// #include "LiveSLAMWrapper.h"
 
 #include <boost/thread.hpp>
 #include "util/settings.h"
@@ -150,7 +150,7 @@ bool imageCheck(cv::Mat imageDist, std::string file) {
     return true;
 }
 
-void run(SlamSystem * system, Undistorter* undistorter, Output3DWrapper* outputWrapper, Sophus::Matrix3f K)
+void run(SlamSystem * system, Undistorter* undistorter, Output3DWrapper* outputWrapper, Sophus::Matrix3f K, Sophus::Matrix3f K2)
 {
     // get HZ
     double hz = 30;
@@ -226,7 +226,7 @@ void run(SlamSystem * system, Undistorter* undistorter, Output3DWrapper* outputW
             printf("FULL RESET!\n");
             delete system;
 
-            system = new SlamSystem(w, h, K, doSlam);
+            system = new SlamSystem(w, h, K, K2, doSlam);
             system->setVisualization(outputWrapper);
 
             fullResetRequested = false;
@@ -249,6 +249,7 @@ int main( int argc, char** argv )
 	// if no undistortion is required, the undistorter will just pass images through.
 	std::string calibFile;
 	Undistorter* undistorter = 0;
+    Undistorter* undistorter2 = 0;
 
 	if(Parse::arg(argc, argv, "-c", calibFile) > 0)
 	{
@@ -260,6 +261,17 @@ int main( int argc, char** argv )
 		printf("need camera calibration file! (set using -c FILE)\n");
 		exit(0);
 	}
+    
+    // using a complement video sequence
+    if (Parse::arg(argc, argv, "-c2", calibFile) > 0) {
+        useHelpSeq = true;
+        undistorter2 = Undistorter::getUndistorterForFile(calibFile.c_str());
+    }
+    
+    if (useHelpSeq && undistorter2 == 0) {
+        printf("video sequence 2 needs camera calibration file! (set using -c2 FILE)\n");
+        exit(0);
+    }
 
 	w = undistorter->getOutputWidth();
 	h = undistorter->getOutputHeight();
@@ -276,18 +288,30 @@ int main( int argc, char** argv )
 
 	Resolution::getInstance(w, h);
 	Intrinsics::getInstance(fx, fy, cx, cy);
+    
+    // use help sequence
+    float fx2, fy2, cx2, cy2;
+    Sophus::Matrix3f K2;
+    if (useHelpSeq) {
+        fx2 = undistorter2->getK().at<double>(0, 0);
+        fy2 = undistorter2->getK().at<double>(1, 1);
+        cx2 = undistorter2->getK().at<double>(2, 0);
+        cy2 = undistorter2->getK().at<double>(2, 1);
+        K2 << fx2, 0.0, cx2, 0.0, fy2, cy2, 0.0, 0.0, 1.0;
+    }
 
 	gui.initImages();
 
 	Output3DWrapper* outputWrapper = new PangolinOutput3DWrapper(w, h, gui);
 
 	// make slam system
-	SlamSystem * system = new SlamSystem(w, h, K, doSlam);
+	SlamSystem * system = new SlamSystem(w, h, K, K2, doSlam);
 	system->setVisualization(outputWrapper);
 
 
 	// open image files: first try to open as file.
 	std::string source;
+    std::string source2;
 	if(!(Parse::arg(argc, argv, "-f", source) > 0))
 	{
 		printf("need source files! (set using -f FOLDER or KLG)\n");
@@ -295,9 +319,8 @@ int main( int argc, char** argv )
 	}
     
     // use help video sequence
-    std::string helpSource;
-    if (useHelpSeq && !(Parse::arg(argc, argv, "-h", helpSource))) {
-        printf("need help video source files! (set using -h FOLDER)\n");
+    if (useHelpSeq && !(Parse::arg(argc, argv, "-f2", source2))) {
+        printf("need help video source files! (set using -f2 FOLDER)\n");
         exit(0);
     }
 
@@ -328,11 +351,11 @@ int main( int argc, char** argv )
         }
         
         if (useHelpSeq) {
-            if(getdir(helpSource, helpFiles) >= 0)
+            if(getdir(source2, helpFiles) >= 0)
             {
                 printf("help sequence: found %d image files in folder %s!\n", (int)helpFiles.size(), source.c_str());
             }
-            else if(getFile(helpSource, helpFiles) >= 0)
+            else if(getFile(source2, helpFiles) >= 0)
             {
                 printf("help sequence: found %d image files in file %s!\n", (int)helpFiles.size(), source.c_str());
             }
@@ -345,7 +368,7 @@ int main( int argc, char** argv )
         numFrames = (int)files.size();
     }
 
-	boost::thread lsdThread(run, system, undistorter, outputWrapper, K);
+	boost::thread lsdThread(run, system, undistorter, outputWrapper, K, K2);
     
     cv::namedWindow("Main", 1);
     cv::setMouseCallback("Main", CallBackFunc, NULL);

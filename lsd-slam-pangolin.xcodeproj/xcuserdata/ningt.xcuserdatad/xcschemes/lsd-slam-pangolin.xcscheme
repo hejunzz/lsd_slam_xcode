@@ -63,11 +63,11 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "-f /Users/ningt/Documents/LSD_room/images/"
+            argument = "-f /Users/ningt/Documents/LSD_room/dr1/images/"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-c /Users/ningt/Documents/LSD_room/cameraCalibration.cfg"
+            argument = "-c /Users/ningt/Documents/LSD_room/dr1/calibration.cfg"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

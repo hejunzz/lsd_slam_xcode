@@ -44,7 +44,7 @@ class Sim3Tracker;
 class DepthMap;
 class Frame;
 class DataSet;
-class LiveSLAMWrapper;
+// class LiveSLAMWrapper;
 class Output3DWrapper;
 class TrackableKeyFrameSearch;
 class FramePoseStruct;
@@ -63,13 +63,14 @@ public:
 	int width;
 	int height;
 	Eigen::Matrix3f K;
+    Eigen::Matrix3f K2;
 	const bool SLAMEnabled;
 
 	bool trackingIsGood;
 
 	bool finalized;
 
-	SlamSystem(int w, int h, Eigen::Matrix3f K, bool enableSLAM = true);
+	SlamSystem(int w, int h, Eigen::Matrix3f K, Eigen::Matrix3f K2, bool enableSLAM = true);
 	SlamSystem(const SlamSystem&) = delete;
 	SlamSystem& operator=(const SlamSystem&) = delete;
 	~SlamSystem();
