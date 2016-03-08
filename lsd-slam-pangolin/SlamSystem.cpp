@@ -71,6 +71,7 @@ SlamSystem::SlamSystem(int w, int h, Eigen::Matrix3f K, Eigen::Matrix3f K2, bool
 	createNewKeyFrame = false;
 
 	map =  new DepthMap(w,h,K);
+    helpMap = new DepthMap(w,h,K2);
 	
 	newConstraintAdded = false;
 	haveUnmergedOptimizationOffset = false;
@@ -83,8 +84,13 @@ SlamSystem::SlamSystem(int w, int h, Eigen::Matrix3f K, Eigen::Matrix3f K2, bool
     }
     
 	// Do not use more than 4 levels for odometry tracking
-	for (int level = 4; level < PYRAMID_LEVELS; ++level)
+    for (int level = 4; level < PYRAMID_LEVELS; ++level) {
 		tracker->settings.maxItsPerLvl[level] = 0;
+        
+        if (useHelpSeq) {
+            helpTracker->settings.maxItsPerLvl[level] = 0;
+        }
+    }
 	trackingReference = new TrackingReference();
 	
     // edited by Tang Ning
@@ -484,6 +490,10 @@ void SlamSystem::createNewCurrentKeyframe(std::shared_ptr<Frame> newKeyframeCand
 
 	// propagate & make new.
 	map->createKeyFrame(newKeyframeCandidate.get());
+    
+    if (useHelpSeq) {
+        helpMap->createKeyFrame(newHelpKeyframeCandidate.get());
+    }
 
 	if(printPropagationStatistics)
 	{
@@ -534,7 +544,7 @@ void SlamSystem::changeKeyframe(bool noCreate, bool force, float maxScore)
 		nFindReferences++;
 	}
 
-	if(newReferenceKF != 0)
+    if(newReferenceKF != 0)
 		loadNewCurrentKeyframe(newReferenceKF);
 	else
 	{
@@ -879,13 +889,15 @@ void SlamSystem::randomInit(uchar* image, uchar* helpImage, double timeStamp, in
 	currentKeyFrameMutex.lock();
 
 	currentKeyFrame.reset(new Frame(id, width, height, K, timeStamp, image));
-	map->initializeRandomly(currentKeyFrame.get());
-	keyFrameGraph->addFrame(currentKeyFrame.get());
+    map->initializeRandomly(currentKeyFrame.get());
     
     if (useHelpSeq) {
         helpCurrentKeyFrame.reset(new Frame(id, width, height, K2, timeStamp, helpImage));
         prevHelpTrackedFrame = helpCurrentKeyFrame.get()->pose;
+        helpMap->initializeRandomly(helpCurrentKeyFrame.get());
     }
+    
+	keyFrameGraph->addFrame(currentKeyFrame.get());
 
 	currentKeyFrameMutex.unlock();
 
@@ -932,7 +944,7 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
 		trackingReferenceFrameSharedPT = currentKeyFrame;
         
         if (useHelpSeq) {
-            helpTrackingReference->importFrame(helpCurrentKeyFrame.get());
+            helpTrackingReference->importFrame(currentKeyFrame.get());
         }
 	}
     
@@ -940,8 +952,9 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
 	FramePoseStruct* trackingReferencePose = trackingReference->keyframe->pose;
 
     FramePoseStruct* helpTrackingReferencePose = nullptr;
-    if (useHelpSeq)
+    if (useHelpSeq) {
         helpTrackingReferencePose =  helpTrackingReference->keyframe->pose;
+    }
 
     currentKeyFrameMutex.unlock();
 
@@ -952,9 +965,9 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
 
 	poseConsistencyMutex.lock_shared();
 	SE3 frameToReference_initialEstimate = se3FromSim3(
-			trackingReferencePose->getCamToWorld().inverse() * keyFrameGraph->allFramePoses.back()->getCamToWorld());
-
-    // need some modification
+        trackingReferencePose->getCamToWorld().inverse() * keyFrameGraph->allFramePoses.back()->getCamToWorld());
+    
+    // complement video sequence
     SE3 helpFrameToReference_initialEstimate;
     if (useHelpSeq) {
         helpFrameToReference_initialEstimate = se3FromSim3(
@@ -963,8 +976,6 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
     
     poseConsistencyMutex.unlock_shared();
 
-
-
 	struct timeval tv_start, tv_end;
 	gettimeofday(&tv_start, NULL);
 
@@ -972,13 +983,10 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
 			trackingReference,
 			trackingNewFrame.get(),
 			frameToReference_initialEstimate);
-
+    
     SE3 newRefToHelpFrame_poseUpdate;
     if (useHelpSeq) {
-        newRefToHelpFrame_poseUpdate = helpTracker->trackFrame(
-                helpTrackingReference,
-                helpTrackingNewFrame.get(),
-                helpFrameToReference_initialEstimate);
+        newRefToHelpFrame_poseUpdate = helpTracker->trackFrame(helpTrackingReference, helpTrackingNewFrame.get(), helpFrameToReference_initialEstimate);
     }
 
 	gettimeofday(&tv_end, NULL);
@@ -993,22 +1001,6 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
 
 	if(manualTrackingLossIndicated || tracker->diverged || (keyFrameGraph->keyframesAll.size() > INITIALIZATION_PHASE_COUNT && !tracker->trackingWasGood))
 	{
-        if (tracker->diverged && useHelpSeq) {
-            if (!tracker->diverged) {
-                trackingNewFrame->pose->trackingParent = helpTrackingReference->keyframe->pose;
-                trackingNewFrame->pose->thisToParent_raw = helpTrackingNewFrame->pose->thisToParent_raw;
-            }
-            else {
-                printf("HELP SEQ TRACKING LOST for frame %d (%1.2f%% good Points, which is %1.2f%% of available points, %s)!\n",
-                       trackingNewFrame->id(),
-                       100*tracking_lastGoodPerTotal,
-                       100*tracking_lastGoodPerBad,
-                       tracker->diverged ? "DIVERGED" : "NOT DIVERGED");
-                
-                helpTrackingReference->invalidate();
-            }
-        }
-        
         printf("TRACKING LOST for frame %d (%1.2f%% good Points, which is %1.2f%% of available points, %s)!\n",
                trackingNewFrame->id(),
                100*tracking_lastGoodPerTotal,
@@ -1046,7 +1038,6 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
 	}
 
 	keyFrameGraph->addFrame(trackingNewFrame.get());
-    prevHelpTrackedFrame = helpTrackingNewFrame.get()->pose;
 
 
 	//Sim3 lastTrackedCamToWorld = mostCurrentTrackedFrame->getScaledCamToWorld();//  mostCurrentTrackedFrame->TrackingParent->getScaledCamToWorld() * sim3FromSE3(mostCurrentTrackedFrame->thisToParent_SE3TrackingResult, 1.0);

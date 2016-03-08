@@ -318,9 +318,7 @@ SE3 SE3Tracker::trackFrame(
 		numCalcResidualCalls[lvl] = 0;
 		numCalcWarpUpdateCalls[lvl] = 0;
 
-        if (!useHelpSeq) {
-            reference->makePointCloud(lvl);
-        }
+        reference->makePointCloud(lvl);
         
         if (lvl == 1 && takingScreenShot) {
             reference->writePointCloud("pointCloud" + std::to_string(frame->id()) + ".xyz", lvl);

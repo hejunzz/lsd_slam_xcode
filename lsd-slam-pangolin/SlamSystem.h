@@ -138,6 +138,7 @@ private:
 
 	// ============= EXCLUSIVELY MAPPING THREAD (+ init) =============
 	DepthMap* map;
+    DepthMap* helpMap;
 	TrackingReference* mappingTrackingReference;
 
 	// during re-localization used

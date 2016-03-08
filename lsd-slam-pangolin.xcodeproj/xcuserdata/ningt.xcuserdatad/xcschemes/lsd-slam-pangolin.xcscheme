@@ -67,15 +67,15 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "-f2 /Users/ningt/Documents/LSD_room/2seq/seq2/images/"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "-c /Users/ningt/Documents/LSD_room/2seq/calibration1.cfg"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-c2 /Users/ningt/Documents/LSD_room/2seq/calibration2.cfg"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-f2 /Users/ningt/Documents/LSD_room/2seq/seq2/images/"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
