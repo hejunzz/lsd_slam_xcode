@@ -351,11 +351,11 @@ int main( int argc, char** argv )
         if (useHelpSeq) {
             if(getdir(source2, helpFiles) >= 0)
             {
-                printf("help sequence: found %d image files in folder %s!\n", (int)helpFiles.size(), source.c_str());
+                printf("help sequence: found %d image files in folder %s!\n", (int)helpFiles.size(), source2.c_str());
             }
             else if(getFile(source2, helpFiles) >= 0)
             {
-                printf("help sequence: found %d image files in file %s!\n", (int)helpFiles.size(), source.c_str());
+                printf("help sequence: found %d image files in file %s!\n", (int)helpFiles.size(), source2.c_str());
             }
             else
             {

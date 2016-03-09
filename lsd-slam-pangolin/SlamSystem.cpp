@@ -953,7 +953,7 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
 
     FramePoseStruct* helpTrackingReferencePose = nullptr;
     if (useHelpSeq) {
-        helpTrackingReferencePose =  helpTrackingReference->keyframe->pose;
+        helpTrackingReferencePose = helpTrackingReference->keyframe->pose;
     }
 
     currentKeyFrameMutex.unlock();
@@ -986,7 +986,10 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
     
     SE3 newRefToHelpFrame_poseUpdate;
     if (useHelpSeq) {
-        newRefToHelpFrame_poseUpdate = helpTracker->trackFrame(helpTrackingReference, helpTrackingNewFrame.get(), helpFrameToReference_initialEstimate);
+        newRefToHelpFrame_poseUpdate = helpTracker->trackFrame(
+            helpTrackingReference,
+            helpTrackingNewFrame.get(),
+            helpFrameToReference_initialEstimate);
     }
 
 	gettimeofday(&tv_end, NULL);
@@ -1001,23 +1004,31 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
 
 	if(manualTrackingLossIndicated || tracker->diverged || (keyFrameGraph->keyframesAll.size() > INITIALIZATION_PHASE_COUNT && !tracker->trackingWasGood))
 	{
-        printf("TRACKING LOST for frame %d (%1.2f%% good Points, which is %1.2f%% of available points, %s)!\n",
-               trackingNewFrame->id(),
-               100*tracking_lastGoodPerTotal,
-               100*tracking_lastGoodPerBad,
-               tracker->diverged ? "DIVERGED" : "NOT DIVERGED");
-        
-        trackingReference->invalidate();
-        
-        trackingIsGood = false;
-        nextRelocIdx = -1;
-        
-        unmappedTrackedFramesMutex.lock();
-        unmappedTrackedFramesSignal.notify_one();
-        unmappedTrackedFramesMutex.unlock();
-        
-        manualTrackingLossIndicated = false;
-        return;
+        if (tracker->diverged && !helpTracker->diverged) {
+            trackingNewFrame->initialTrackedResidual = 1.0f;
+            trackingNewFrame->pose->thisToParent_raw = helpTrackingNewFrame->pose->thisToParent_raw;
+            trackingNewFrame->pose->trackingParent = trackingReference->keyframe->pose;
+        }
+        else {
+            printf("TRACKING LOST for frame %d (%1.2f%% good Points, which is %1.2f%% of available points, %s)!\n",
+                   trackingNewFrame->id(),
+                   100*tracking_lastGoodPerTotal,
+                   100*tracking_lastGoodPerBad,
+                   tracker->diverged ? "DIVERGED" : "NOT DIVERGED");
+            
+            trackingReference->invalidate();
+            helpTrackingReference->invalidate();
+            
+            trackingIsGood = false;
+            nextRelocIdx = -1;
+            
+            unmappedTrackedFramesMutex.lock();
+            unmappedTrackedFramesSignal.notify_one();
+            unmappedTrackedFramesMutex.unlock();
+            
+            manualTrackingLossIndicated = false;
+            return;
+        }
 	}
 
 
@@ -1394,8 +1405,8 @@ int SlamSystem::findConstraintsForNewKeyFrames(Frame* newKeyFrame, bool forcePar
 
 
 
-	int closeAll = closeCandidates.size();
-	int farAll = farCandidates.size();
+	int closeAll = (int) closeCandidates.size();
+	int farAll = (int) farCandidates.size();
 
 	// erase the ones that we tried already before (close)
 	for(std::unordered_set<Frame*>::iterator c = closeCandidates.begin(); c != closeCandidates.end();)
