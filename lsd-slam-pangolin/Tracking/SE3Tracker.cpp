@@ -430,10 +430,6 @@ SE3 SE3Tracker::trackFrame(
 				}
 				else
 				{
-                    if (useHelpSeq) {
-                        
-                    }
-                    
 					if(enablePrintDebugInfo && printTrackingIterationInfo)
 					{
 						printf("(%d-%d): REJECTED increment of %f with lambda %.1f, (residual: %f -> %f)\n",

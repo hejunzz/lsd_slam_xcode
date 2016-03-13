@@ -55,7 +55,7 @@ public:
 	/**
 	 * does obervation and regularization only.
 	 **/
-	void updateKeyframe(std::deque< std::shared_ptr<Frame> > referenceFrames);
+    void updateKeyframe(std::deque< std::shared_ptr<Frame> > referenceFrames);
 
 	/**
 	 * does propagation and whole-filling-regularization (no observation, for that need to call updateKeyframe()!)

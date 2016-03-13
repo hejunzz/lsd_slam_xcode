@@ -132,6 +132,7 @@ private:
     // edited by Tang Ning
     TrackingReference* helpTrackingReference;
     std::shared_ptr<Frame> helpCurrentKeyFrame;
+    std::shared_ptr<Frame> helpTrackingReferenceFrameSharedPT;
     SE3Tracker* helpTracker;
     FramePoseStruct* prevHelpTrackedFrame;
 
@@ -194,6 +195,7 @@ private:
 
 	// PUSHED in tracking, READ & CLEARED in mapping
 	std::deque< std::shared_ptr<Frame> > unmappedTrackedFrames;
+    std::deque< std::shared_ptr<Frame> > unmappedHelpTrackedFrames;
 	boost::mutex unmappedTrackedFramesMutex;
 	boost::condition_variable  unmappedTrackedFramesSignal;
 

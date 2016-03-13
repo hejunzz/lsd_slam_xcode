@@ -192,16 +192,12 @@ void run(SlamSystem * system, Undistorter* undistorter, Output3DWrapper* outputW
         }
 
         assert(imageDist.type() == CV_8U);
-
         undistorter->undistort(imageDist, image);
-
         assert(image.type() == CV_8U);
         
         if (useHelpSeq) {
             assert(helpImageDist.type() == CV_8U);
-            
             undistorter->undistort(helpImageDist, helpImage);
-            
             assert(helpImage.type() == CV_8U);
         }
 

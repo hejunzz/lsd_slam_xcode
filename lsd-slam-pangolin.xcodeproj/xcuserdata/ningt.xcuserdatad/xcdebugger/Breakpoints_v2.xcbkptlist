@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "lsd-slam-pangolin/SlamSystem.cpp"
-            timestampString = "479120549.485012"
+            timestampString = "479540768.901283"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "548"
-            endingLineNumber = "548"
+            startingLineNumber = "561"
+            endingLineNumber = "561"
             landmarkName = "SlamSystem::changeKeyframe(bool noCreate, bool force, float maxScore)"
             landmarkType = "5">
          </BreakpointContent>
@@ -48,6 +48,22 @@
             startingLineNumber = "965"
             endingLineNumber = "965"
             landmarkName = "DepthMap::initializeFromGTDepth(Frame* new_frame)"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "lsd-slam-pangolin/Tracking/SE3Tracker.cpp"
+            timestampString = "479457658.950585"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "378"
+            endingLineNumber = "378"
+            landmarkName = "SE3Tracker::trackFrame( TrackingReference* reference, Frame* frame, const SE3&amp; frameToReference_initialEstimate)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
