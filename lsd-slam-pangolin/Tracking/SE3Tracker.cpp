@@ -280,7 +280,8 @@ SE3 SE3Tracker::trackFrameOnPermaref(
 SE3 SE3Tracker::trackFrame(
 		TrackingReference* reference,
 		Frame* frame,
-		const SE3& frameToReference_initialEstimate)
+		const SE3& frameToReference_initialEstimate,
+        bool isSeq1)
 {
 
 	boost::shared_lock<boost::shared_mutex> lock = frame->getActiveLock();
@@ -320,7 +321,7 @@ SE3 SE3Tracker::trackFrame(
 
         reference->makePointCloud(lvl);
         
-        if (lvl == 1 && takingScreenShot) {
+        if (lvl == 1 && isSeq1 && takingScreenShot) {
             reference->writePointCloud("pointCloud" + std::to_string(frame->id()) + ".xyz", lvl);
             takingScreenShot = false;
         }

@@ -134,7 +134,7 @@ private:
     std::shared_ptr<Frame> helpCurrentKeyFrame;
     std::shared_ptr<Frame> helpTrackingReferenceFrameSharedPT;
     SE3Tracker* helpTracker;
-    FramePoseStruct* prevHelpTrackedFrame;
+    Sim3 rt; // transform matrix between two video sequence thisToParent
 
 
 	// ============= EXCLUSIVELY MAPPING THREAD (+ init) =============
@@ -181,7 +181,7 @@ private:
 	// Individual / no locking
 	Output3DWrapper* outputWrapper;	// no lock required
 	KeyFrameGraph* keyFrameGraph;	// has own locks
-
+    KeyFrameGraph* helpKeyFrameGraph;
 
 
 	// Tracking: if (!create) set candidate, set create.

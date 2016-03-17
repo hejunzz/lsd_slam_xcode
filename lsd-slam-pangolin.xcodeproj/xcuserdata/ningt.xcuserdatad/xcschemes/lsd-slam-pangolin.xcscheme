@@ -63,19 +63,19 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "-f /Users/ningt/Documents/LSD_room/2seq/seq22/"
+            argument = "-f /Users/ningt/Documents/LSD_room/2seq/seq11/"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-f2 /Users/ningt/Documents/LSD_room/2seq/seq12/"
+            argument = "-f2 /Users/ningt/Documents/LSD_room/2seq/seq21/"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-c /Users/ningt/Documents/LSD_room/2seq/calibration2.cfg"
+            argument = "-c /Users/ningt/Documents/LSD_room/2seq/calibration1.cfg"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-c2 /Users/ningt/Documents/LSD_room/2seq/calibration1.cfg"
+            argument = "-c2 /Users/ningt/Documents/LSD_room/2seq/calibration2.cfg"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

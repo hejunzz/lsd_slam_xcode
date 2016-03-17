@@ -65,7 +65,8 @@ public:
 	SE3 trackFrame(
 			TrackingReference* reference,
 			Frame* frame,
-			const SE3& frameToReference_initialEstimate);
+			const SE3& frameToReference_initialEstimate,
+            bool isSeq1 = true);
 	
 
 	SE3 trackFrameOnPermaref(

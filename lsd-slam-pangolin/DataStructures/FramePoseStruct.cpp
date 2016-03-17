@@ -87,10 +87,10 @@ Sim3 FramePoseStruct::getCamToWorld(int recursionDepth)
 	assert(recursionDepth < 5000);
 
 	// if the node is in the graph, it's absolute pose is only changed by optimization.
-	if(isOptimized) return camToWorld;
+    if(isOptimized) return camToWorld;
 
 
-	// return chached pose, if still valid.
+	// return cached pose, if still valid.
 	if(cacheValidFor == cacheValidCounter)
 		return camToWorld;
 
