@@ -364,8 +364,8 @@ int main( int argc, char** argv )
 
 	boost::thread lsdThread(run, system, undistorter, outputWrapper, K, K2);
     
-    cv::namedWindow("Main", 1);
-    cv::setMouseCallback("Main", CallBackFunc, NULL);
+//    cv::namedWindow("Main", 1);
+//    cv::setMouseCallback("Main", CallBackFunc, NULL);
 
 	while(!pangolin::ShouldQuit())
 	{

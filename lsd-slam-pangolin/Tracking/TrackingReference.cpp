@@ -146,7 +146,7 @@ namespace lsd_slam
     
     void TrackingReference::writePointCloud(std::string file, int level) {
         std::ofstream output;
-        output.open(file);
+        output.open(file, std::fstream::app);
         output.precision(6);
         
         output << "3" << std::endl;
