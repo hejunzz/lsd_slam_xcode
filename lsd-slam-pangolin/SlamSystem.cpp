@@ -481,11 +481,21 @@ void SlamSystem::discardCurrentKeyframe()
 		if(p->trackingParent != 0 && p->trackingParent->frameID == currentKeyFrame->id())
 			p->trackingParent = 0;
 	}
+    
+    for (FramePoseStruct* p : helpKeyFrameGraph->allFramePoses) {
+        if (p->trackingParent != 0 && p->trackingParent->frameID == helpCurrentKeyFrame->id())
+            p->trackingParent = 0;
+    }
 	keyFrameGraph->allFramePosesMutex.unlock();
 
 
 	keyFrameGraph->idToKeyFrameMutex.lock();
 	keyFrameGraph->idToKeyFrame.erase(currentKeyFrame->id());
+    
+    if (useHelpSeq) {
+        helpKeyFrameGraph->idToKeyFrame.erase(helpCurrentKeyFrame->id());
+    }
+    
 	keyFrameGraph->idToKeyFrameMutex.unlock();
 
 }
@@ -501,6 +511,11 @@ void SlamSystem::createNewCurrentKeyframe(std::shared_ptr<Frame> newKeyframeCand
 		// add NEW keyframe to id-lookup
 		keyFrameGraph->idToKeyFrameMutex.lock();
 		keyFrameGraph->idToKeyFrame.insert(std::make_pair(newKeyframeCandidate->id(), newKeyframeCandidate));
+        
+        if (useHelpSeq) {
+            helpKeyFrameGraph->idToKeyFrame.insert(std::make_pair(newHelpKeyframeCandidate->id(), newHelpKeyframeCandidate));
+        }
+        
 		keyFrameGraph->idToKeyFrameMutex.unlock();
 	}
 
@@ -539,6 +554,12 @@ void SlamSystem::loadNewCurrentKeyframe(Frame* keyframeToLoad)
 
 	currentKeyFrameMutex.lock();
 	currentKeyFrame = keyFrameGraph->idToKeyFrame.find(keyframeToLoad->id())->second;
+    
+    if (useHelpSeq) {
+        helpCurrentKeyFrame = helpKeyFrameGraph->idToKeyFrame.find(keyframeToLoad->id())->second;
+        helpMap->setFromExistingKF( &*helpCurrentKeyFrame );
+    }
+    
 	currentKeyFrame->depthHasBeenUpdatedFlag = false;
 	currentKeyFrameMutex.unlock();
 }
@@ -561,7 +582,7 @@ void SlamSystem::changeKeyframe(bool noCreate, bool force, float maxScore)
 
     if(newReferenceKF != 0) {
 		loadNewCurrentKeyframe(newReferenceKF);
-        printf("load new current key frame");
+        printf("Load new current key frame\n");
     }
 	else
 	{
@@ -946,6 +967,11 @@ void SlamSystem::randomInit(uchar* image, uchar* helpImage, double timeStamp, in
 	{
 		keyFrameGraph->idToKeyFrameMutex.lock();
 		keyFrameGraph->idToKeyFrame.insert(std::make_pair(currentKeyFrame->id(), currentKeyFrame));
+        
+        if (useHelpSeq) {
+            helpKeyFrameGraph->idToKeyFrame.insert(std::make_pair(helpCurrentKeyFrame->id(), helpCurrentKeyFrame));
+        }
+        
 		keyFrameGraph->idToKeyFrameMutex.unlock();
 	}
 	if(continuousPCOutput && outputWrapper != 0) outputWrapper->publishKeyframe(currentKeyFrame.get());
