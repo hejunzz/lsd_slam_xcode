@@ -1057,14 +1057,32 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             rt = rt_new;
         }
         else if (frameID <= 180) {
-            rt = Sim3((rt.matrix() + rt_new.matrix()) / 2);
+            // method 1
+            // rt = Sim3((rt.matrix() + rt_new.matrix()) / 2);
+            
+            // method 2: average
+            rt = Sim3( rt.matrix() * (frameID-1) / frameID + rt_new.matrix() / frameID);
+            
+            // method 3: square root
+            // Eigen::Matrix4d rtMat= rt.matrix();
+            // for (size_t i = 0; i < rtMat.rows(); i++) {
+            //    for (size_t j = 0; j < rtMat.cols(); j++) {
+            //        rtMat(i, j) = sqrt(rtMat(i, j) * rt_new.matrix()(i, j));
+            //    }
+            // }
         }
         
 //        std::cout << "New Transform matrix is \n";
 //        std::cout << rt_new.matrix() << std::endl;
-//        
+        
 //        std::cout << "Updated Transform matrix is \n";
 //        std::cout << rt.matrix() << std::endl;
+        
+//        std::cout << "Original thisToParent1 is \n";
+//        std::cout << thisToParent1.matrix() << std::endl;
+//        
+//        std::cout << "Transform back to thisToParent1 is \n";
+//        std::cout << (thisToParent2 * rt).matrix() << std::endl;
     }
 
     if (useHelpSeq) {
