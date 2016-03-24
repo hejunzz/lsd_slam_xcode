@@ -1135,12 +1135,14 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
                    tracker->diverged ? "DIVERGED" : "NOT DIVERGED");
             
             trackingNewFrame->pose->thisToParent_raw = helpTrackingNewFrame->pose->thisToParent_raw * rt;
+            trackingNewFrame->pose->thisToParent_raw.setScale(helpCurrentKeyFrame->pose->thisToParent_raw.scale());
             trackingNewFrame->pose->trackingParent = trackingReference->keyframe->pose;
         }
         else if (helpTracker->diverged) {
             printf("HELP SEQUENCE TRACKING LOST for frame %d!\n", helpTrackingNewFrame->id());
             
             helpTrackingNewFrame->pose->thisToParent_raw = trackingNewFrame->pose->thisToParent_raw * rt.inverse();
+            helpTrackingNewFrame->pose->thisToParent_raw.setScale(trackingNewFrame->pose->thisToParent_raw.scale());
             helpTrackingNewFrame->pose->trackingParent = helpTrackingReference->keyframe->pose;
         }
     }
