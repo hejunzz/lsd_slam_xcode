@@ -1092,7 +1092,6 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             // rt1 = Sim3((rt.matrix() + rt_new.matrix()) / 2);
             
             // method 2: average
-//            std::cout << "last good: " << tracking_lastGoodPerBad << " " << helpTracking_lastGoodPerBad << std::endl;
             if (tracking_lastGoodPerTotal > 0.9 && helpTracking_lastGoodPerBad > 0.9) {
                 rt = Sim3( rt.matrix() * (frameID-1) / frameID + rt_new.matrix() / frameID);
                 rt2 = rt;
@@ -1141,9 +1140,6 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             // update tracking reference camToWorld
             FramePoseStruct *trackingParentPtr = trackingReferencePose;
             FramePoseStruct *helpTrackingParentPtr = helpTrackingReferencePose;
-            
-//            std::cout << "before update tracking reference camToWorld " << std::endl;
-//            std::cout << trackingReferencePose->getCamToWorld().matrix() << std::endl;
 
             while (trackingParentPtr != nullptr) {
                 trackingParentPtr->thisToParent_raw = helpTrackingParentPtr->thisToParent_raw * rt;
@@ -1153,15 +1149,24 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
                 helpTrackingParentPtr = helpTrackingParentPtr->trackingParent;
             }
             
-//            std::cout << "after update tracking reference camToWorld " << std::endl;
-//            std::cout << trackingReferencePose->getCamToWorld().matrix() << std::endl;
-            
             trackingNewFrame->pose->thisToParent_raw = helpTrackingNewFrame->pose->thisToParent_raw * rt;
             trackingNewFrame->pose->thisToParent_raw.setScale(helpCurrentKeyFrame->pose->thisToParent_raw.scale());
             trackingNewFrame->pose->trackingParent = trackingReference->keyframe->pose;
         }
         else if (helpTracker->diverged) {
             printf("HELP SEQUENCE TRACKING LOST for frame %d!\n", helpTrackingNewFrame->id());
+            
+            // update help tracking reference camToWorld
+            FramePoseStruct *trackingParentPtr = trackingReferencePose;
+            FramePoseStruct *helpTrackingParentPtr = helpTrackingReferencePose;
+            
+            while (helpTrackingParentPtr != nullptr) {
+                helpTrackingParentPtr->thisToParent_raw = trackingParentPtr->thisToParent_raw * rt;
+                helpTrackingParentPtr->invalidateCache();
+                
+                trackingParentPtr = trackingParentPtr->trackingParent;
+                helpTrackingParentPtr = helpTrackingParentPtr->trackingParent;
+            }
             
             helpTrackingNewFrame->pose->thisToParent_raw = trackingNewFrame->pose->thisToParent_raw * rt.inverse();
             helpTrackingNewFrame->pose->thisToParent_raw.setScale(trackingNewFrame->pose->thisToParent_raw.scale());
