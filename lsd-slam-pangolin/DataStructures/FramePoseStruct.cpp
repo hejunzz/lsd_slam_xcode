@@ -81,6 +81,7 @@ void FramePoseStruct::invalidateCache()
 {
 	cacheValidFor = -1;
 }
+    
 Sim3 FramePoseStruct::getCamToWorld(int recursionDepth)
 {
 	// prevent stack overflow

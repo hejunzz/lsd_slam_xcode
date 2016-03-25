@@ -1316,14 +1316,6 @@ void DepthMap::createKeyFrame(Frame* new_keyframe)
 	gettimeofday(&tv_end_all, NULL);
 	msCreate = 0.9*msCreate + 0.1*((tv_end_all.tv_sec-tv_start_all.tv_sec)*1000.0f + (tv_end_all.tv_usec-tv_start_all.tv_usec)/1000.0f);
 	nCreate++;
-
-
-
-	if(plotStereoImages)
-	{
-		//Util::displayImage( "KeyFramePropagation", debugImageHypothesisPropagation );
-	}
-
 }
 
 void DepthMap::addTimingSample()
