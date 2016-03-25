@@ -1161,7 +1161,7 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             FramePoseStruct *helpTrackingParentPtr = helpTrackingReferencePose;
             
             while (helpTrackingParentPtr != nullptr) {
-                helpTrackingParentPtr->thisToParent_raw = trackingParentPtr->thisToParent_raw * rt;
+                helpTrackingParentPtr->thisToParent_raw = trackingParentPtr->thisToParent_raw * rt.inverse();
                 helpTrackingParentPtr->invalidateCache();
                 
                 trackingParentPtr = trackingParentPtr->trackingParent;
