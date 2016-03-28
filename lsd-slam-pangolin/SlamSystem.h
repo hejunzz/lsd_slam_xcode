@@ -162,6 +162,9 @@ private:
 	float tracking_lastUsage;
 	float tracking_lastGoodPerBad;
 	float tracking_lastGoodPerTotal;
+    
+    float prevSum = 0;
+    float prevTrkTime = 0;
 
 	int lastNumConstraintsAddedOnFullRetrack;
 	bool doFinalOptimization;

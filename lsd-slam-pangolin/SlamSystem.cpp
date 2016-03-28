@@ -1040,7 +1040,13 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
         Sim3 helpRefPose = helpTrackingReferencePose->getCamToWorld();
         Sim3 pose2 = helpKeyFrameGraph->allFramePoses.back()->getCamToWorld();
         
-        helpFrameToReference_initialEstimate = se3FromSim3(helpRefPose.inverse() * pose2);
+        Sim3 initialEstimate = helpRefPose.inverse() * pose2;
+        
+        if (initialEstimate.quaternion().squaredNorm() <= 0) {
+            initialEstimate.setScale(1);
+        }
+        
+        helpFrameToReference_initialEstimate = se3FromSim3(initialEstimate);
     }
     
     poseConsistencyMutex.unlock_shared();
@@ -1066,6 +1072,10 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
     msTrackFrame = 0.9*msTrackFrame + 0.1*((tv_end.tv_sec-tv_start.tv_sec)*1000.0f + (tv_end.tv_usec-tv_start.tv_usec)/1000.0f);
     nTrackFrame++;
     
+    prevTrkTime = prevTrkTime * (frameID - 1) / frameID + msTrackFrame / frameID;
+    
+    std::cout << "average tracking time is " << prevTrkTime << std::endl;
+    
     tracking_lastResidual = tracker->lastResidual;
     tracking_lastUsage = tracker->pointUsage;
     tracking_lastGoodPerBad = tracker->lastGoodCount / (tracker->lastGoodCount + tracker->lastBadCount);
@@ -1082,35 +1092,45 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
         Sim3 thisToParent2_inv = thisToParent2.inverse();
         Sim3 rt_new = thisToParent2_inv * thisToParent1;
         
-        Sim3 rt1, rt2, rt3;
-        
         if (frameID <= 10) {
             rt = rt_new;
         }
-        else if (frameID <= 120) {
+        else if (frameID <= 120 && tracking_lastGoodPerBad > 0.9 && helpTracking_lastGoodPerBad > 0.9) {
+            
             // method 1
-            // rt1 = Sim3((rt.matrix() + rt_new.matrix()) / 2);
+            rt = Sim3((rt.matrix() + rt_new.matrix()) / 2);
             
             // method 2: average
-            if (tracking_lastGoodPerTotal > 0.9 && helpTracking_lastGoodPerBad > 0.9) {
-                rt = Sim3( rt.matrix() * (frameID-1) / frameID + rt_new.matrix() / frameID);
-                rt2 = rt;
-            }
+//            rt = Sim3( rt.matrix() * (frameID-1) / frameID + rt_new.matrix() / frameID);
+
             // method 3: square root
-            //            Eigen::Matrix4d rtMat= rt.matrix();
-            //            for (size_t i = 0; i < rtMat.rows(); i++) {
-            //                for (size_t j = 0; j < rtMat.cols(); j++) {
-            //                    rtMat(i, j) = sqrt(rtMat(i, j) * rt_new.matrix()(i, j));
-            //                }
-            //            }
-            //            rt3 = Sim3(rtMat);
-        }
+//            Eigen::Matrix4d rtMat= rt.matrix();
+//            for (size_t i = 0; i < rtMat.rows(); i++) {
+//                for (size_t j = 0; j < rtMat.cols(); j++) {
+//                    rtMat(i, j) = sqrt(std::abs(rtMat(i, j) * rt_new.matrix()(i, j)));
+//                }
+//            }
+//            rt = Sim3(rtMat);
         
-//        std::cout << "Original thisToParent1 is \n";
-//        std::cout << thisToParent1.matrix() << std::endl;
-//        
-//        std::cout << "Transform back to thisToParent1 is \n";
-//        std::cout << (thisToParent2 * rt).matrix() << std::endl;
+            //        std::cout << "Original thisToParent1 is \n";
+            //        std::cout << thisToParent1.matrix() << std::endl;
+            //
+            //        std::cout << "Transform back to thisToParent1 is \n";
+            //        std::cout << (thisToParent2 * rt).matrix() << std::endl;
+            
+//            Eigen::Matrix4d diffMat = thisToParent1.matrix() - (thisToParent2 * rt).matrix();
+//            
+//            float sum = 0;
+//            for (size_t i = 0; i < diffMat.rows(); i++) {
+//                for (size_t j = 0; j < diffMat.cols(); j++) {
+//                    sum += pow(diffMat(i, j), 2);
+//                }
+//            }
+//            
+//            prevSum = prevSum * (frameID - 1) / frameID + sum / frameID;
+//            
+//            std::cout << "diff is : " << prevSum << std::endl;
+        }
     }
     
     if (useHelpSeq) {

@@ -398,7 +398,7 @@ SE3 SE3Tracker::trackFrame(
 						printf("(%d-%d): ACCEPTED increment of %f with lambda %.1f, residual: %f -> %f\n",
 								lvl,iteration, sqrt(inc.dot(inc)), LM_lambda, lastErr, error);
 
-						printf("         p=%.4f %.4f %.4f %.4f %.4f %.4f\n",
+						printf("p=%.4f %.4f %.4f %.4f %.4f %.4f\n",
 								referenceToFrame.log()[0],referenceToFrame.log()[1],referenceToFrame.log()[2],
 								referenceToFrame.log()[3],referenceToFrame.log()[4],referenceToFrame.log()[5]);
 					}
