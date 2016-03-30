@@ -1085,9 +1085,11 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
     tracking_lastGoodPerBad = tracker->lastGoodCount / (tracker->lastGoodCount + tracker->lastBadCount);
     tracking_lastGoodPerTotal = tracker->lastGoodCount / (trackingNewFrame->width(SE3TRACKING_MIN_LEVEL)*trackingNewFrame->height(SE3TRACKING_MIN_LEVEL));
     
+    float helpTracking_lastGoodPerBad, helpTracking_lastGoodPerTotal;
     if (useHelpSeq) {
         // compute good points for help sequence
-        float helpTracking_lastGoodPerBad = helpTracker->lastGoodCount / (helpTracker->lastGoodCount + helpTracker->lastBadCount);
+        helpTracking_lastGoodPerBad = helpTracker->lastGoodCount / (helpTracker->lastGoodCount + helpTracker->lastBadCount);
+        tracking_lastGoodPerTotal = tracker->lastGoodCount / (trackingNewFrame->width(SE3TRACKING_MIN_LEVEL)*trackingNewFrame->height(SE3TRACKING_MIN_LEVEL));
         
         Sim3 thisToParent1 = trackingNewFrame->pose->thisToParent_raw;
         Sim3 thisToParent2 = helpTrackingNewFrame->pose->thisToParent_raw;
@@ -1136,6 +1138,14 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
     }
     
     if (useHelpSeq) {
+        // take better estimation of scale
+        if (tracking_lastGoodPerTotal < helpTracking_lastGoodPerTotal) {
+            trackingNewFrame->pose->thisToParent_raw.setScale(helpCurrentKeyFrame->pose->thisToParent_raw.scale());
+        }
+        else {
+            helpTrackingNewFrame->pose->thisToParent_raw.setScale(trackingNewFrame->pose->thisToParent_raw.scale());
+        }
+        
         if (tracker->diverged && helpTracker->diverged) {
             printf("BOTH SEQUENCES TRACKING LOST for frame %d!\n", trackingNewFrame->id());
             
@@ -1232,22 +1242,6 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
     }
     
     if (useHelpSeq) {
-        //        std::cout << "seq1 this to parent" << std::endl;
-        //        std::cout << trackingNewFrame->pose->thisToParent_raw.matrix() << std::endl;
-        //
-        //        std::cout << "seq2 this to parent" << std::endl;
-        //        std::cout << helpTrackingNewFrame->pose->thisToParent_raw.matrix() << std::endl;
-        //
-        //        if (frameID > 200) {
-        //            Eigen::Matrix4d thisToParent1 = trackingNewFrame->pose->thisToParent_raw.matrix();
-        //            Eigen::Matrix4d thisToParent2 = helpTrackingNewFrame->pose->thisToParent_raw.matrix();
-        //
-        //            thisToParent1(2,3) = thisToParent2(1,3);
-        //
-        //            std::cout << "seq1 this to parent after correction" << std::endl;
-        //            std::cout << thisToParent1 << std::endl;
-        //        }
-        
         keyFrameGraph->addFrame(trackingNewFrame.get());
         helpKeyFrameGraph->addFrame(helpTrackingNewFrame.get());
     }
