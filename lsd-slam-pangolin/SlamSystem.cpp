@@ -1076,9 +1076,9 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
     msTrackFrame = 0.9*msTrackFrame + 0.1*((tv_end.tv_sec-tv_start.tv_sec)*1000.0f + (tv_end.tv_usec-tv_start.tv_usec)/1000.0f);
     nTrackFrame++;
     
-    prevTrkTime = prevTrkTime * (frameID - 1) / frameID + msTrackFrame / frameID;
-    
-    std::cout << "average tracking time is " << prevTrkTime << std::endl;
+//    prevTrkTime = prevTrkTime * (frameID - 1) / frameID + msTrackFrame / frameID;
+//    std::cout << "average tracking time is " << prevTrkTime << std::endl;
+    printf("Processing frame %d\n", frameID);
     
     tracking_lastResidual = tracker->lastResidual;
     tracking_lastUsage = tracker->pointUsage;
@@ -1086,8 +1086,6 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
     tracking_lastGoodPerTotal = tracker->lastGoodCount / (trackingNewFrame->width(SE3TRACKING_MIN_LEVEL)*trackingNewFrame->height(SE3TRACKING_MIN_LEVEL));
     
     if (useHelpSeq) {
-        printf("Processing frame %d\n", frameID);
-        
         // compute good points for help sequence
         float helpTracking_lastGoodPerBad = helpTracker->lastGoodCount / (helpTracker->lastGoodCount + helpTracker->lastBadCount);
         
