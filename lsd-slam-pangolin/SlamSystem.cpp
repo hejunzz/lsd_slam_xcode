@@ -1032,6 +1032,11 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
     Sim3 pose1 = keyFrameGraph->allFramePoses.back()->getCamToWorld();
     
     poseConsistencyMutex.lock_shared();
+    
+    if (refPose.quaternion().squaredNorm() <= 0) {
+        refPose.setScale(1);
+    }
+    
     SE3 frameToReference_initialEstimate = se3FromSim3(refPose.inverse() * pose1);
     
     // complement video sequence
@@ -1040,12 +1045,11 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
         Sim3 helpRefPose = helpTrackingReferencePose->getCamToWorld();
         Sim3 pose2 = helpKeyFrameGraph->allFramePoses.back()->getCamToWorld();
         
-        Sim3 initialEstimate = helpRefPose.inverse() * pose2;
-        
-        if (initialEstimate.quaternion().squaredNorm() <= 0) {
-            initialEstimate.setScale(1);
+        if (helpRefPose.quaternion().squaredNorm() <= 0) {
+            helpRefPose.setScale(1);
         }
         
+        Sim3 initialEstimate = helpRefPose.inverse() * pose2;
         helpFrameToReference_initialEstimate = se3FromSim3(initialEstimate);
     }
     
