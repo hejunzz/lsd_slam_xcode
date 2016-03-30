@@ -1033,11 +1033,14 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
     
     poseConsistencyMutex.lock_shared();
     
-    if (refPose.quaternion().squaredNorm() <= 0) {
-        refPose.setScale(1);
+    SE3 frameToReference_initialEstimate;
+    try {
+        frameToReference_initialEstimate = se3FromSim3(refPose.inverse() * pose1);
     }
-    
-    SE3 frameToReference_initialEstimate = se3FromSim3(refPose.inverse() * pose1);
+    catch (Sophus::SophusException e) {
+        refPose.rxso3().setScale(1);
+        frameToReference_initialEstimate = se3FromSim3(refPose.inverse() * pose1);
+    }
     
     // complement video sequence
     SE3 helpFrameToReference_initialEstimate;
@@ -1045,12 +1048,13 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
         Sim3 helpRefPose = helpTrackingReferencePose->getCamToWorld();
         Sim3 pose2 = helpKeyFrameGraph->allFramePoses.back()->getCamToWorld();
         
-        if (helpRefPose.quaternion().squaredNorm() <= 0) {
-            helpRefPose.setScale(1);
+        try {
+            helpFrameToReference_initialEstimate = se3FromSim3(helpRefPose.inverse() * pose2);
         }
-        
-        Sim3 initialEstimate = helpRefPose.inverse() * pose2;
-        helpFrameToReference_initialEstimate = se3FromSim3(initialEstimate);
+        catch (Sophus::SophusException e) {
+            helpRefPose.rxso3().setScale(1);
+            helpFrameToReference_initialEstimate = se3FromSim3(helpRefPose.inverse() * pose2);
+        }
     }
     
     poseConsistencyMutex.unlock_shared();
@@ -1076,8 +1080,8 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
     msTrackFrame = 0.9*msTrackFrame + 0.1*((tv_end.tv_sec-tv_start.tv_sec)*1000.0f + (tv_end.tv_usec-tv_start.tv_usec)/1000.0f);
     nTrackFrame++;
     
-//    prevTrkTime = prevTrkTime * (frameID - 1) / frameID + msTrackFrame / frameID;
-//    std::cout << "average tracking time is " << prevTrkTime << std::endl;
+    //    prevTrkTime = prevTrkTime * (frameID - 1) / frameID + msTrackFrame / frameID;
+    //    std::cout << "average tracking time is " << prevTrkTime << std::endl;
     printf("Processing frame %d\n", frameID);
     
     tracking_lastResidual = tracker->lastResidual;
@@ -1085,67 +1089,75 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
     tracking_lastGoodPerBad = tracker->lastGoodCount / (tracker->lastGoodCount + tracker->lastBadCount);
     tracking_lastGoodPerTotal = tracker->lastGoodCount / (trackingNewFrame->width(SE3TRACKING_MIN_LEVEL)*trackingNewFrame->height(SE3TRACKING_MIN_LEVEL));
     
-    float helpTracking_lastGoodPerBad, helpTracking_lastGoodPerTotal;
     if (useHelpSeq) {
-        // compute good points for help sequence
-        helpTracking_lastGoodPerBad = helpTracker->lastGoodCount / (helpTracker->lastGoodCount + helpTracker->lastBadCount);
-        tracking_lastGoodPerTotal = tracker->lastGoodCount / (trackingNewFrame->width(SE3TRACKING_MIN_LEVEL)*trackingNewFrame->height(SE3TRACKING_MIN_LEVEL));
-        
         Sim3 thisToParent1 = trackingNewFrame->pose->thisToParent_raw;
         Sim3 thisToParent2 = helpTrackingNewFrame->pose->thisToParent_raw;
         Sim3 thisToParent2_inv = thisToParent2.inverse();
         Sim3 rt_new = thisToParent2_inv * thisToParent1;
         
+        std::cout << "seq1 last good " << tracker->lastGoodCount << std::endl;
+        std::cout << "seq1 last good " << helpTracker->lastGoodCount << std::endl;
+        
+        // take better estimation of scale
+        if (tracker->lastGoodCount < helpTracker->lastGoodCount) {
+            trackingNewFrame->pose->thisToParent_raw.rxso3().setScale(helpCurrentKeyFrame->pose->thisToParent_raw.scale());
+        }
+        else {
+            helpTrackingNewFrame->pose->thisToParent_raw.rxso3().setScale(trackingNewFrame->pose->thisToParent_raw.scale());
+        }
+        
+        // take better tracked camera pos
+        //        if (tracker->lastGoodCount * 5 < helpTracker->lastGoodCount) {
+        //            trackingNewFrame->pose->thisToParent_raw = helpTrackingNewFrame->pose->thisToParent_raw * rt;
+        //        }
+        //        else if (helpTracker->lastGoodCount * 5 < tracker->lastGoodCount) {
+        //            helpTrackingNewFrame->pose->thisToParent_raw = trackingNewFrame->pose->thisToParent_raw * rt.inverse();
+        //        }
+        
         if (frameID <= 10) {
             rt = rt_new;
+            rt.setScale(1);
         }
-        else if (frameID <= 120 && tracking_lastGoodPerBad > 0.9 && helpTracking_lastGoodPerBad > 0.9) {
+        else if (tracker->lastGoodCount > 1000 && helpTracker->lastGoodCount > 1000) {
             
             // method 1
-            rt = Sim3((rt.matrix() + rt_new.matrix()) / 2);
+            rt = rt_new;
+            rt.setScale(1);
             
             // method 2: average
-//            rt = Sim3( rt.matrix() * (frameID-1) / frameID + rt_new.matrix() / frameID);
-
+            //            rt = Sim3( rt.matrix() * (frameID-1) / frameID + rt_new.matrix() / frameID);
+            
             // method 3: square root
-//            Eigen::Matrix4d rtMat= rt.matrix();
-//            for (size_t i = 0; i < rtMat.rows(); i++) {
-//                for (size_t j = 0; j < rtMat.cols(); j++) {
-//                    rtMat(i, j) = sqrt(std::abs(rtMat(i, j) * rt_new.matrix()(i, j)));
-//                }
-//            }
-//            rt = Sim3(rtMat);
-        
+            //            Eigen::Matrix4d rtMat= rt.matrix();
+            //            for (size_t i = 0; i < rtMat.rows(); i++) {
+            //                for (size_t j = 0; j < rtMat.cols(); j++) {
+            //                    rtMat(i, j) = sqrt(std::abs(rtMat(i, j) * rt_new.matrix()(i, j)));
+            //                }
+            //            }
+            //            rt = Sim3(rtMat);
+            
             //        std::cout << "Original thisToParent1 is \n";
             //        std::cout << thisToParent1.matrix() << std::endl;
             //
             //        std::cout << "Transform back to thisToParent1 is \n";
             //        std::cout << (thisToParent2 * rt).matrix() << std::endl;
             
-//            Eigen::Matrix4d diffMat = thisToParent1.matrix() - (thisToParent2 * rt).matrix();
-//            
-//            float sum = 0;
-//            for (size_t i = 0; i < diffMat.rows(); i++) {
-//                for (size_t j = 0; j < diffMat.cols(); j++) {
-//                    sum += pow(diffMat(i, j), 2);
-//                }
-//            }
-//            
-//            prevSum = prevSum * (frameID - 1) / frameID + sum / frameID;
-//            
-//            std::cout << "diff is : " << prevSum << std::endl;
+            //            Eigen::Matrix4d diffMat = thisToParent1.matrix() - (thisToParent2 * rt).matrix();
+            
+            //            float sum = 0;
+            //            for (size_t i = 0; i < diffMat.rows(); i++) {
+            //                for (size_t j = 0; j < diffMat.cols(); j++) {
+            //                    sum += pow(diffMat(i, j), 2);
+            //                }
+            //            }
+            //
+            //            prevSum = prevSum * (frameID - 1) / frameID + sum / frameID;
+            //
+            //            std::cout << "diff is : " << prevSum << std::endl;
         }
     }
     
     if (useHelpSeq) {
-        // take better estimation of scale
-        if (tracking_lastGoodPerTotal < helpTracking_lastGoodPerTotal) {
-            trackingNewFrame->pose->thisToParent_raw.setScale(helpCurrentKeyFrame->pose->thisToParent_raw.scale());
-        }
-        else {
-            helpTrackingNewFrame->pose->thisToParent_raw.setScale(trackingNewFrame->pose->thisToParent_raw.scale());
-        }
-        
         if (tracker->diverged && helpTracker->diverged) {
             printf("BOTH SEQUENCES TRACKING LOST for frame %d!\n", trackingNewFrame->id());
             
@@ -1170,16 +1182,16 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             
             
             // update tracking reference camToWorld
-            FramePoseStruct *trackingParentPtr = trackingReferencePose;
-            FramePoseStruct *helpTrackingParentPtr = helpTrackingReferencePose;
-
-            while (trackingParentPtr != nullptr) {
-                trackingParentPtr->thisToParent_raw = helpTrackingParentPtr->thisToParent_raw * rt;
-                trackingParentPtr->invalidateCache();
-                
-                trackingParentPtr = trackingParentPtr->trackingParent;
-                helpTrackingParentPtr = helpTrackingParentPtr->trackingParent;
-            }
+            //            FramePoseStruct *trackingParentPtr = trackingReferencePose;
+            //            FramePoseStruct *helpTrackingParentPtr = helpTrackingReferencePose;
+            //
+            //            while (trackingParentPtr != nullptr) {
+            //                trackingParentPtr->thisToParent_raw = helpTrackingParentPtr->thisToParent_raw * rt;
+            //                trackingParentPtr->invalidateCache();
+            //
+            //                trackingParentPtr = trackingParentPtr->trackingParent;
+            //                helpTrackingParentPtr = helpTrackingParentPtr->trackingParent;
+            //            }
             
             trackingNewFrame->pose->thisToParent_raw = helpTrackingNewFrame->pose->thisToParent_raw * rt;
             trackingNewFrame->pose->thisToParent_raw.setScale(helpCurrentKeyFrame->pose->thisToParent_raw.scale());
@@ -1189,16 +1201,16 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             printf("HELP SEQUENCE TRACKING LOST for frame %d!\n", helpTrackingNewFrame->id());
             
             // update help tracking reference camToWorld
-            FramePoseStruct *trackingParentPtr = trackingReferencePose;
-            FramePoseStruct *helpTrackingParentPtr = helpTrackingReferencePose;
-            
-            while (helpTrackingParentPtr != nullptr) {
-                helpTrackingParentPtr->thisToParent_raw = trackingParentPtr->thisToParent_raw * rt.inverse();
-                helpTrackingParentPtr->invalidateCache();
-                
-                trackingParentPtr = trackingParentPtr->trackingParent;
-                helpTrackingParentPtr = helpTrackingParentPtr->trackingParent;
-            }
+            //            FramePoseStruct *trackingParentPtr = trackingReferencePose;
+            //            FramePoseStruct *helpTrackingParentPtr = helpTrackingReferencePose;
+            //
+            //            while (helpTrackingParentPtr != nullptr) {
+            //                helpTrackingParentPtr->thisToParent_raw = trackingParentPtr->thisToParent_raw * rt.inverse();
+            //                helpTrackingParentPtr->invalidateCache();
+            //
+            //                trackingParentPtr = trackingParentPtr->trackingParent;
+            //                helpTrackingParentPtr = helpTrackingParentPtr->trackingParent;
+            //            }
             
             helpTrackingNewFrame->pose->thisToParent_raw = trackingNewFrame->pose->thisToParent_raw * rt.inverse();
             helpTrackingNewFrame->pose->thisToParent_raw.setScale(trackingNewFrame->pose->thisToParent_raw.scale());
