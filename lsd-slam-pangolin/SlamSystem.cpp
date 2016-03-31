@@ -1038,7 +1038,7 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
         frameToReference_initialEstimate = se3FromSim3(refPose.inverse() * pose1);
     }
     catch (Sophus::SophusException e) {
-        refPose.rxso3().setScale(1);
+        refPose.setScale(1);
         frameToReference_initialEstimate = se3FromSim3(refPose.inverse() * pose1);
     }
     
@@ -1052,7 +1052,7 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             helpFrameToReference_initialEstimate = se3FromSim3(helpRefPose.inverse() * pose2);
         }
         catch (Sophus::SophusException e) {
-            helpRefPose.rxso3().setScale(1);
+            helpRefPose.setScale(1);
             helpFrameToReference_initialEstimate = se3FromSim3(helpRefPose.inverse() * pose2);
         }
     }
@@ -1114,11 +1114,13 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
         //            helpTrackingNewFrame->pose->thisToParent_raw = trackingNewFrame->pose->thisToParent_raw * rt.inverse();
         //        }
         
+        float helpTracking_lastGoodPerBad = helpTracker->lastGoodCount / (helpTracker->lastGoodCount + helpTracker->lastBadCount);
+        
         if (frameID <= 10) {
             rt = rt_new;
             rt.setScale(1);
         }
-        else if (tracker->lastGoodCount > 1000 && helpTracker->lastGoodCount > 1000) {
+        else if (tracking_lastGoodPerBad > 0.9 && helpTracking_lastGoodPerBad > 0.9) {
             
             // method 1
             rt = rt_new;
