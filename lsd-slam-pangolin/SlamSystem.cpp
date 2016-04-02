@@ -65,6 +65,10 @@ SlamSystem::SlamSystem(int w, int h, Eigen::Matrix3f K, Eigen::Matrix3f K2, bool
     this->K2 = K2;
     trackingIsGood = true;
     
+    maxPosDiff << 0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0;
     
     currentKeyFrame =  nullptr;
     trackingReferenceFrameSharedPT = nullptr;
@@ -1115,48 +1119,68 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             
             
             // update tracking reference camToWorld
-            FramePoseStruct *trackingParentPtr = trackingReferencePose;
-            FramePoseStruct *helpTrackingParentPtr = helpTrackingReferencePose;
+            //            FramePoseStruct *trackingParentPtr = trackingReferencePose;
+            //            FramePoseStruct *helpTrackingParentPtr = helpTrackingReferencePose;
+            //
+            //            while (trackingParentPtr != nullptr) {
+            //                trackingParentPtr->thisToParent_raw = helpTrackingParentPtr->thisToParent_raw * rt;
+            //                trackingParentPtr->invalidateCache();
+            //
+            //                trackingParentPtr = trackingParentPtr->trackingParent;
+            //                helpTrackingParentPtr = helpTrackingParentPtr->trackingParent;
+            //            }
             
-            while (trackingParentPtr != nullptr) {
-                trackingParentPtr->thisToParent_raw = helpTrackingParentPtr->thisToParent_raw * rt;
-                trackingParentPtr->invalidateCache();
-                
-                trackingParentPtr = trackingParentPtr->trackingParent;
-                helpTrackingParentPtr = helpTrackingParentPtr->trackingParent;
+            Eigen::Matrix4d estimation = (se3FromSim3(helpTrackingNewFrame->pose->thisToParent_raw) * rt).matrix() - frameToReference_initialEstimate.matrix();
+            
+            for (size_t i = 0; i < estimation.rows(); i++) {
+                for (size_t j = 0; j < estimation.cols(); j++) {
+                    if (std::abs(estimation(i, j)) > maxPosDiff(i, j))
+                        estimation(i, j) = estimation(i, j) / std::abs(estimation(i, j)) * maxPosDiff(i, j);
+                }
             }
             
-            trackingNewFrame->pose->thisToParent_raw = helpTrackingNewFrame->pose->thisToParent_raw * rt;
-            trackingNewFrame->pose->thisToParent_raw.setScale(helpCurrentKeyFrame->pose->thisToParent_raw.scale());
+            Sim3 sim3_estimation = sim3FromSE3(SE3(frameToReference_initialEstimate.matrix() + estimation), helpCurrentKeyFrame->pose->thisToParent_raw.scale());
+            
+            trackingNewFrame->pose->thisToParent_raw = sim3_estimation;
             trackingNewFrame->pose->trackingParent = trackingReferencePose;
         }
         else if (helpTracker->diverged) {
             printf("HELP SEQUENCE TRACKING LOST for frame %d!\n", helpTrackingNewFrame->id());
             
             // update help tracking reference camToWorld
-            FramePoseStruct *trackingParentPtr = trackingReferencePose;
-            FramePoseStruct *helpTrackingParentPtr = helpTrackingReferencePose;
+            //            FramePoseStruct *trackingParentPtr = trackingReferencePose;
+            //            FramePoseStruct *helpTrackingParentPtr = helpTrackingReferencePose;
+            //
+            //            while (helpTrackingParentPtr != nullptr) {
+            //                helpTrackingParentPtr->thisToParent_raw = trackingParentPtr->thisToParent_raw * rt.inverse();
+            //                helpTrackingParentPtr->invalidateCache();
+            //
+            //                trackingParentPtr = trackingParentPtr->trackingParent;
+            //                helpTrackingParentPtr = helpTrackingParentPtr->trackingParent;
+            //            }
             
-            while (helpTrackingParentPtr != nullptr) {
-                helpTrackingParentPtr->thisToParent_raw = trackingParentPtr->thisToParent_raw * rt.inverse();
-                helpTrackingParentPtr->invalidateCache();
-                
-                trackingParentPtr = trackingParentPtr->trackingParent;
-                helpTrackingParentPtr = helpTrackingParentPtr->trackingParent;
-            }
-            
-            helpTrackingNewFrame->pose->thisToParent_raw = trackingNewFrame->pose->thisToParent_raw * rt.inverse();
-            helpTrackingNewFrame->pose->thisToParent_raw.setScale(trackingNewFrame->pose->thisToParent_raw.scale());
-            helpTrackingNewFrame->pose->trackingParent = helpTrackingReferencePose;
+            //            helpTrackingNewFrame->pose->thisToParent_raw = trackingNewFrame->pose->thisToParent_raw * rt.inverse();
+            //            helpTrackingNewFrame->pose->thisToParent_raw.setScale(trackingNewFrame->pose->thisToParent_raw.scale());
+            //            helpTrackingNewFrame->pose->trackingParent = helpTrackingReferencePose;
         }
         else {
-            Sim3 thisToParent1 = trackingNewFrame->pose->thisToParent_raw;
-            Sim3 thisToParent2 = helpTrackingNewFrame->pose->thisToParent_raw;
-            Sim3 thisToParent2_inv = thisToParent2.inverse();
-            Sim3 rt_new = thisToParent2_inv * thisToParent1;
+            SE3 thisToParent1 = se3FromSim3( trackingNewFrame->pose->thisToParent_raw );
+            SE3 thisToParent2 = se3FromSim3( helpTrackingNewFrame->pose->thisToParent_raw );
+            SE3 thisToParent2_inv = thisToParent2.inverse();
+            SE3 rt_new = thisToParent2_inv * thisToParent1;
             
             //        std::cout << "seq1 last good " << tracker->lastGoodCount << std::endl;
             //        std::cout << "seq1 last good " << helpTracker->lastGoodCount << std::endl;
+            
+            // compute tracking pose change over frames
+            Eigen::Matrix4d posDiff = thisToParent1.matrix() - frameToReference_initialEstimate.matrix();
+            
+            for (size_t i = 0; i < posDiff.rows(); i++) {
+                for (size_t j = 0; j < posDiff.cols(); j++) {
+                    if (std::abs(posDiff(i, j)) > maxPosDiff(i, j))
+                        maxPosDiff(i, j) = std::abs(posDiff(i, j));
+                }
+            }
             
             // take better estimation of scale
             if (tracker->lastGoodCount < helpTracker->lastGoodCount) {
@@ -1168,15 +1192,12 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             
             float helpTracking_lastGoodPerBad = helpTracker->lastGoodCount / (helpTracker->lastGoodCount + helpTracker->lastBadCount);
             
-            if (frameID <= 10) {
-                rt = rt_new;
-                rt.setScale(1);
-            }
-            else if (frameID <= 120 && tracking_lastGoodPerBad > 0.9 && helpTracking_lastGoodPerBad > 0.9) {
+            if ( tracking_lastGoodPerBad > 0.9 && helpTracking_lastGoodPerBad > 0.9) {
                 
                 // method 1
-                rt = Sim3( (rt.matrix() + rt_new.matrix()) / 2 );
-//                rt.setScale(1);
+                //                rt = Sim3( (rt.matrix() + rt_new.matrix()) / 2 );
+                rt = rt_new;
+
                 
                 // method 2: average
                 //            rt = Sim3( rt.matrix() * (frameID-1) / frameID + rt_new.matrix() / frameID);
@@ -1197,13 +1218,13 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
                 //        std::cout << (thisToParent2 * rt).matrix() << std::endl;
                 
                 //            Eigen::Matrix4d diffMat = thisToParent1.matrix() - (thisToParent2 * rt).matrix();
-                
-                //            float sum = 0;
-                //            for (size_t i = 0; i < diffMat.rows(); i++) {
-                //                for (size_t j = 0; j < diffMat.cols(); j++) {
-                //                    sum += pow(diffMat(i, j), 2);
+                //
+                //                float sum = 0;
+                //                for (size_t i = 0; i < diffMat.rows(); i++) {
+                //                    for (size_t j = 0; j < diffMat.cols(); j++) {
+                //                        sum += pow(diffMat(i, j), 2);
+                //                    }
                 //                }
-                //            }
                 //
                 //            prevSum = prevSum * (frameID - 1) / frameID + sum / frameID;
                 //

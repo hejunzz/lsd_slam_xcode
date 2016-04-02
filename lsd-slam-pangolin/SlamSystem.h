@@ -68,6 +68,8 @@ public:
 
 	bool trackingIsGood;
 
+    Eigen::Matrix4d maxPosDiff;
+    
 	bool finalized;
 
 	SlamSystem(int w, int h, Eigen::Matrix3f K, Eigen::Matrix3f K2, bool enableSLAM = true);
@@ -134,7 +136,7 @@ private:
     std::shared_ptr<Frame> helpCurrentKeyFrame;
     std::shared_ptr<Frame> helpTrackingReferenceFrameSharedPT;
     SE3Tracker* helpTracker;
-    Sim3 rt; // transform matrix between two video sequence thisToParent
+    SE3 rt; // transform matrix between two video sequence thisToParent
 
 
 	// ============= EXCLUSIVELY MAPPING THREAD (+ init) =============
