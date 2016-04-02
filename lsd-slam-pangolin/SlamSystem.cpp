@@ -1141,6 +1141,8 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             
             Sim3 sim3_estimation = sim3FromSE3(SE3(frameToReference_initialEstimate.matrix() + estimation), helpCurrentKeyFrame->pose->thisToParent_raw.scale());
             
+            // Sim3 sim3_estimation = sim3FromSE3(se3FromSim3(trackingNewFrame->pose->thisToParent_raw) * rt, helpCurrentKeyFrame->pose->thisToParent_raw.scale());
+            
             trackingNewFrame->pose->thisToParent_raw = sim3_estimation;
             trackingNewFrame->pose->trackingParent = trackingReferencePose;
         }
@@ -1192,15 +1194,18 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             
             float helpTracking_lastGoodPerBad = helpTracker->lastGoodCount / (helpTracker->lastGoodCount + helpTracker->lastBadCount);
             
-            if ( tracking_lastGoodPerBad > 0.9 && helpTracking_lastGoodPerBad > 0.9) {
+            if (frameID <= 10) {
+                rt = rt_new;
+            }
+            else if ( tracking_lastGoodPerBad > 0.9 && helpTracking_lastGoodPerBad > 0.9) {
                 
                 // method 1
                 //                rt = Sim3( (rt.matrix() + rt_new.matrix()) / 2 );
-                rt = rt_new;
-
+                // rt = rt_new;
+                
                 
                 // method 2: average
-                //            rt = Sim3( rt.matrix() * (frameID-1) / frameID + rt_new.matrix() / frameID);
+                rt = SE3( rt.matrix() * (frameID-1) / frameID + rt_new.matrix() / frameID);
                 
                 // method 3: square root
                 //            Eigen::Matrix4d rtMat= rt.matrix();
