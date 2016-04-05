@@ -1130,19 +1130,26 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             //                helpTrackingParentPtr = helpTrackingParentPtr->trackingParent;
             //            }
             
-            Eigen::Matrix4d estimation = (se3FromSim3(helpTrackingNewFrame->pose->thisToParent_raw) * rt).matrix() - frameToReference_initialEstimate.matrix();
+//            Sim3 sim3_estimation = sim3FromSE3(SE3(frameToReference_initialEstimate.matrix() + estimation), helpCurrentKeyFrame->pose->thisToParent_raw.scale());
             
-            for (size_t i = 0; i < estimation.rows(); i++) {
-                for (size_t j = 0; j < estimation.cols(); j++) {
-                    if (std::abs(estimation(i, j)) > maxPosDiff(i, j))
-                        estimation(i, j) = estimation(i, j) / std::abs(estimation(i, j)) * maxPosDiff(i, j);
-                }
+            Eigen::Matrix4d prevFrameMat = se3FromSim3(keyFrameGraph->allFramePoses.back()->thisToParent_raw).matrix();
+            Eigen::Matrix4d estimateMat = (se3FromSim3(helpTrackingNewFrame->pose->thisToParent_raw) * rt).matrix();
+            
+            Eigen::Matrix4d diffMat = estimateMat - prevFrameMat;
+            
+            std::cout << prevFrameMat << std::endl;
+            std::cout << estimateMat << std::endl;
+            
+            for (size_t i = 0; i < 3; i++) {
+                std::cout << diffMat(i, 3) << std::endl;
+                std::cout << maxPosDiff(i, 3) << std::endl;
+                if (std::abs(diffMat(i, 3)) > maxPosDiff(i, 3))
+                    estimateMat(i, 3) = diffMat(i, 3) / std::abs(diffMat(i, 3)) * maxPosDiff(i, 3) + prevFrameMat(i, 3);
             }
             
-            Sim3 sim3_estimation = sim3FromSE3(SE3(frameToReference_initialEstimate.matrix() + estimation), helpCurrentKeyFrame->pose->thisToParent_raw.scale());
+            std::cout << estimateMat << std::endl;
             
-            // Sim3 sim3_estimation = sim3FromSE3(se3FromSim3(trackingNewFrame->pose->thisToParent_raw) * rt, helpCurrentKeyFrame->pose->thisToParent_raw.scale());
-            
+            Sim3 sim3_estimation = sim3FromSE3(SE3(estimateMat), helpCurrentKeyFrame->pose->thisToParent_raw.scale());
             trackingNewFrame->pose->thisToParent_raw = sim3_estimation;
             trackingNewFrame->pose->trackingParent = trackingReferencePose;
         }
@@ -1175,14 +1182,14 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             //        std::cout << "seq1 last good " << helpTracker->lastGoodCount << std::endl;
             
             // compute tracking pose change over frames
-            Eigen::Matrix4d posDiff = thisToParent1.matrix() - frameToReference_initialEstimate.matrix();
+            Eigen::Matrix4d posDiff = thisToParent1.matrix() - se3FromSim3(keyFrameGraph->allFramePoses.back()->thisToParent_raw).matrix();
             
-            for (size_t i = 0; i < posDiff.rows(); i++) {
-                for (size_t j = 0; j < posDiff.cols(); j++) {
-                    if (std::abs(posDiff(i, j)) > maxPosDiff(i, j))
-                        maxPosDiff(i, j) = std::abs(posDiff(i, j));
-                }
+            for (size_t i = 0; i < 3; i++) {
+                if (std::abs(posDiff(i, 3)) > maxPosDiff(i, 3))
+                    maxPosDiff(i, 3) = std::abs(posDiff(i, 3));
             }
+            
+            std::cout << maxPosDiff << std::endl;
             
             // take better estimation of scale
             if (tracker->lastGoodCount < helpTracker->lastGoodCount) {
@@ -1200,7 +1207,7 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             else if ( tracking_lastGoodPerBad > 0.9 && helpTracking_lastGoodPerBad > 0.9) {
                 
                 // method 1
-                //                rt = Sim3( (rt.matrix() + rt_new.matrix()) / 2 );
+//                rt = SE3( (rt.matrix() + rt_new.matrix()) / 2 );
                 // rt = rt_new;
                 
                 
