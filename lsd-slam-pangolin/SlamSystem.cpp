@@ -1130,9 +1130,9 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             //                helpTrackingParentPtr = helpTrackingParentPtr->trackingParent;
             //            }
             
-//            Sim3 sim3_estimation = sim3FromSE3(SE3(frameToReference_initialEstimate.matrix() + estimation), helpCurrentKeyFrame->pose->thisToParent_raw.scale());
+            //            Sim3 sim3_estimation = sim3FromSE3(SE3(frameToReference_initialEstimate.matrix() + estimation), helpCurrentKeyFrame->pose->thisToParent_raw.scale());
             
-            Eigen::Matrix4d prevFrameMat = se3FromSim3(keyFrameGraph->allFramePoses.back()->thisToParent_raw).matrix();
+            Eigen::Matrix4d prevFrameMat = frameToReference_initialEstimate.matrix();
             Eigen::Matrix4d estimateMat = (se3FromSim3(helpTrackingNewFrame->pose->thisToParent_raw) * rt).matrix();
             
             Eigen::Matrix4d diffMat = estimateMat - prevFrameMat;
@@ -1178,18 +1178,13 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             SE3 thisToParent2_inv = thisToParent2.inverse();
             SE3 rt_new = thisToParent2_inv * thisToParent1;
             
-            //        std::cout << "seq1 last good " << tracker->lastGoodCount << std::endl;
-            //        std::cout << "seq1 last good " << helpTracker->lastGoodCount << std::endl;
-            
             // compute tracking pose change over frames
-            Eigen::Matrix4d posDiff = thisToParent1.matrix() - se3FromSim3(keyFrameGraph->allFramePoses.back()->thisToParent_raw).matrix();
+            Eigen::Matrix4d posDiff = thisToParent1.matrix() - frameToReference_initialEstimate.matrix();
             
             for (size_t i = 0; i < 3; i++) {
                 if (std::abs(posDiff(i, 3)) > maxPosDiff(i, 3))
                     maxPosDiff(i, 3) = std::abs(posDiff(i, 3));
             }
-            
-            std::cout << maxPosDiff << std::endl;
             
             // take better estimation of scale
             if (tracker->lastGoodCount < helpTracker->lastGoodCount) {
@@ -1207,12 +1202,12 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             else if ( tracking_lastGoodPerBad > 0.9 && helpTracking_lastGoodPerBad > 0.9) {
                 
                 // method 1
-//                rt = SE3( (rt.matrix() + rt_new.matrix()) / 2 );
+                rt = SE3( rt.matrix() * (1.0 / 2) + rt_new.matrix() * (1.0 / 2) );
                 // rt = rt_new;
                 
                 
                 // method 2: average
-                rt = SE3( rt.matrix() * (frameID-1) / frameID + rt_new.matrix() / frameID);
+                //                rt = SE3( rt.matrix() * (frameID-1) / frameID + rt_new.matrix() / frameID);
                 
                 // method 3: square root
                 //            Eigen::Matrix4d rtMat= rt.matrix();
