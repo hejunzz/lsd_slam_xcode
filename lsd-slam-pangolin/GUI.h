@@ -41,7 +41,7 @@ class GUI
 
         void addKeyframe(Keyframe * newFrame);
 
-        void updateImage(unsigned char * data);
+        void updateImage(unsigned char * data, unsigned char * data2);
 
         void updateKeyframePoses(GraphFramePose* framePoseData, int num);
 
@@ -57,6 +57,10 @@ class GUI
         pangolin::GlTexture * depthImg;
 
         ThreadMutexObject<unsigned char * > depthImgBuffer;
+    
+        pangolin::GlTexture * depthImg2;
+    
+        ThreadMutexObject<unsigned char * > depthImgBuffer2;
 
         pangolin::Var<int> * gpuMem;
 

@@ -31,9 +31,9 @@ namespace lsd_slam
         
     }
     
-    void PangolinOutput3DWrapper::updateImage(unsigned char * data)
+    void PangolinOutput3DWrapper::updateImage(unsigned char * data, unsigned char * data2)
     {
-        gui.updateImage(data);
+        gui.updateImage(data, data2);
     }
     
     void PangolinOutput3DWrapper::publishKeyframe(Frame* f)

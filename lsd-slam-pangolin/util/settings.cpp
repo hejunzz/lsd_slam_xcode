@@ -89,7 +89,7 @@ namespace lsd_slam
     
     
     // edited by Tang Ning
-    bool useHelpSeq = false;
+    bool useHelpSeq = true;
     bool useFabMap = false;
     bool doSlam = true;
     bool doKFReActivation = true;

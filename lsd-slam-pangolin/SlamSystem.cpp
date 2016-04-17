@@ -72,6 +72,7 @@ SlamSystem::SlamSystem(int w, int h, Eigen::Matrix3f K, Eigen::Matrix3f K2, bool
     
     currentKeyFrame =  nullptr;
     trackingReferenceFrameSharedPT = nullptr;
+    helpTrackingReferenceFrameSharedPT = nullptr;
     keyFrameGraph = new KeyFrameGraph();
     helpKeyFrameGraph = new KeyFrameGraph();
     createNewKeyFrame = false;
@@ -180,6 +181,7 @@ SlamSystem::~SlamSystem()
     
     // make shure to reset all shared pointers to all frames before deleting the keyframegraph!
     unmappedTrackedFrames.clear();
+    unmappedHelpTrackedFrames.clear();
     latestFrameTriedForReloc.reset();
     latestTrackedFrame.reset();
     currentKeyFrame.reset();
@@ -748,6 +750,11 @@ void SlamSystem::addTimingSamples()
 void SlamSystem::debugDisplayDepthMap()
 {
     map->debugPlotDepthMap();
+    
+    if (useHelpSeq) {
+        helpMap->debugPlotDepthMap();
+    }
+    
     double scale = 1;
     if(currentKeyFrame != 0 && currentKeyFrame != 0)
         scale = currentKeyFrame->getScaledCamToWorld().scale();
@@ -776,7 +783,12 @@ void SlamSystem::debugDisplayDepthMap()
     if(onSceenInfoDisplay)
         printMessageOnCVImage(map->debugImageDepth, buf1, buf2);
     
-    outputWrapper->updateImage((unsigned char *)map->debugImageDepth.data);
+    if (useHelpSeq) {
+        outputWrapper->updateImage((unsigned char *)map->debugImageDepth.data, (unsigned char *)helpMap->debugImageDepth.data);
+    }
+    else {
+        outputWrapper->updateImage((unsigned char *)map->debugImageDepth.data, nullptr);
+    }
     
     int pressedKey = Util::waitKey(1);
     handleKey(pressedKey);
@@ -864,8 +876,9 @@ bool SlamSystem::doMappingIteration()
             if(lastTrackingClosenessScore > 1)
                 changeKeyframe(true, false, lastTrackingClosenessScore * 0.75);
             
-            if (displayDepthMap || depthMapScreenshotFlag)
+            if (displayDepthMap || depthMapScreenshotFlag) {
                 debugDisplayDepthMap();
+            }
             
             return false;
         }
@@ -1137,17 +1150,10 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             
             Eigen::Matrix4d diffMat = estimateMat - prevFrameMat;
             
-            std::cout << prevFrameMat << std::endl;
-            std::cout << estimateMat << std::endl;
-            
             for (size_t i = 0; i < 3; i++) {
-                std::cout << diffMat(i, 3) << std::endl;
-                std::cout << maxPosDiff(i, 3) << std::endl;
                 if (std::abs(diffMat(i, 3)) > maxPosDiff(i, 3))
                     estimateMat(i, 3) = diffMat(i, 3) / std::abs(diffMat(i, 3)) * maxPosDiff(i, 3) + prevFrameMat(i, 3);
             }
-            
-            std::cout << estimateMat << std::endl;
             
             Sim3 sim3_estimation = sim3FromSE3(SE3(estimateMat), helpCurrentKeyFrame->pose->thisToParent_raw.scale());
             trackingNewFrame->pose->thisToParent_raw = sim3_estimation;
@@ -1196,7 +1202,7 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
             
             float helpTracking_lastGoodPerBad = helpTracker->lastGoodCount / (helpTracker->lastGoodCount + helpTracker->lastBadCount);
             
-            if (frameID <= 10) {
+            if (frameID <= 2) {
                 rt = rt_new;
             }
             else if ( tracking_lastGoodPerBad > 0.9 && helpTracking_lastGoodPerBad > 0.9) {
@@ -1207,7 +1213,7 @@ void SlamSystem::trackFrame(uchar* image, uchar* helpImage, unsigned int frameID
                 
                 
                 // method 2: average
-                //                rt = SE3( rt.matrix() * (frameID-1) / frameID + rt_new.matrix() / frameID);
+//                rt = SE3( rt.matrix() * (frameID-1) / frameID + rt_new.matrix() / frameID);
                 
                 // method 3: square root
                 //            Eigen::Matrix4d rtMat= rt.matrix();

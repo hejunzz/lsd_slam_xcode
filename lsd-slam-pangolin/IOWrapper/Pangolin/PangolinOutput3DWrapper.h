@@ -36,7 +36,7 @@ namespace lsd_slam
         // publishes a keyframe. if that frame already existis, it is overwritten, otherwise it is added.
         virtual void publishKeyframe(Frame* f);
         
-        virtual void updateImage(unsigned char * data);
+        virtual void updateImage(unsigned char * data, unsigned char * data2);
         
         // published a tracked frame that did not become a keyframe (i.e. has no depth data)
         virtual void publishTrackedFrame(Frame* f);

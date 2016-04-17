@@ -25,10 +25,20 @@ GUI::GUI()
                             .SetHandler(new pangolin::Handler3D(s_cam));
 
     pangolin::Display("Image").SetAspect(640.0f / 480.0f);
-
-    pangolin::Display("multi").SetBounds(pangolin::Attach::Pix(0), 1 / 4.0f, pangolin::Attach::Pix(180), 1.0)
-                              .SetLayout(pangolin::LayoutEqualHorizontal)
-                              .AddDisplay(pangolin::Display("Image"));
+    
+    if (lsd_slam::useHelpSeq) {
+        pangolin::Display("Image2").SetAspect(640.0f / 480.0f);
+        
+        pangolin::Display("multi").SetBounds(pangolin::Attach::Pix(0), 1 / 4.0f, 1/4.0f, 3/4.0f)
+        .SetLayout(pangolin::LayoutEqualHorizontal)
+        .AddDisplay(pangolin::Display("Image"))
+        .AddDisplay(pangolin::Display("Image2"));
+    }
+    else {
+        pangolin::Display("multi").SetBounds(pangolin::Attach::Pix(0), 1 / 4.0f, pangolin::Attach::Pix(180), 1.0f)
+        .SetLayout(pangolin::LayoutEqualHorizontal)
+        .AddDisplay(pangolin::Display("Image"));
+    }
 
     pangolin::CreatePanel("ui").SetBounds(0.0, 1.0, 0.0, pangolin::Attach::Pix(180));
 
@@ -65,15 +75,28 @@ void GUI::initImages()
     depthImg = new pangolin::GlTexture(Resolution::getInstance().width(), Resolution::getInstance().height(), GL_RGB, true, 0, GL_RGB, GL_UNSIGNED_BYTE);
 
     depthImgBuffer.assignValue(new unsigned char[Resolution::getInstance().numPixels() * 3]);
+    
+    if (lsd_slam::useHelpSeq) {
+        depthImg2 = new pangolin::GlTexture(Resolution::getInstance().width(), Resolution::getInstance().height(), GL_RGB, true, 0, GL_RGB, GL_UNSIGNED_BYTE);
+        depthImgBuffer2.assignValue(new unsigned char[Resolution::getInstance().numPixels() * 3]);
+    }
 }
 
-void GUI::updateImage(unsigned char * data)
+void GUI::updateImage(unsigned char * data, unsigned char * data2)
 {
     boost::mutex::scoped_lock lock(depthImgBuffer.getMutex());
 
     memcpy(depthImgBuffer.getReference(), data, Resolution::getInstance().numPixels() * 3);
 
     lock.unlock();
+    
+    if (lsd_slam::useHelpSeq) {
+        boost::mutex::scoped_lock lock2(depthImgBuffer2.getMutex());
+        
+        memcpy(depthImgBuffer2.getReference(), data2, Resolution::getInstance().numPixels() * 3);
+        
+        lock2.unlock();
+    }
 }
 
 void GUI::preCall()
@@ -123,15 +146,24 @@ void GUI::updateKeyframePoses(GraphFramePose* framePoseData, int num)
 
 void GUI::drawImages()
 {
+    if (lsd_slam::useHelpSeq) {
+        boost::mutex::scoped_lock lock2(depthImgBuffer2.getMutex());
+        
+        depthImg2->Upload(depthImgBuffer2.getReference(), GL_RGB, GL_UNSIGNED_BYTE);
+        
+        lock2.unlock();
+        
+        pangolin::Display("Image2").Activate();
+        depthImg2->RenderToViewport(true);
+    }
+    
     boost::mutex::scoped_lock lock(depthImgBuffer.getMutex());
     
     depthImg->Upload(depthImgBuffer.getReference(), GL_RGB, GL_UNSIGNED_BYTE);
     
-
     lock.unlock();
 
     pangolin::Display("Image").Activate();
-
     depthImg->RenderToViewport(true);
 }
 
